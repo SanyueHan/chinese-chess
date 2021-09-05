@@ -1,10 +1,12 @@
 from constants import Role, TURN
 from constants.help import HELP
-from core.ai_players import *
+from core.random_player import *
+from core.pieces_score_player import *
 
 
 STRATEGIES = {
-    0: RandomPlayer
+    0: RandomPlayer,
+    1: PiecesScorePlayer
 }
 
 

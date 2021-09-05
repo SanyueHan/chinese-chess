@@ -16,6 +16,8 @@ core:
 draw decision and long attack
 
 code:
+merge self_pieces/oppo_pieces logics
+merge valid_choices/legal_choices logic
 optimise speed using switch case
 
 algorithm:

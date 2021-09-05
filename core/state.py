@@ -13,6 +13,8 @@ class State(Board):
         # None for never calculated, [] for calculated but no result
         self._valid_choices = None
         self._legal_choices = None
+        self._self_pieces = None
+        self._oppo_pieces = None
 
     def parse(self, command):
         """
@@ -157,7 +159,7 @@ class State(Board):
             col = self.cols[self_general[1]]
             s = min(self_general[0], oppo_general[0])
             e = max(self_general[0], oppo_general[0])
-            path = col[s+1:e]
+            path = col[s + 1:e]
             if len(path) == path.count(' '):
                 raise ValueError(f"Invalid movement: General exposed. ")
 
@@ -169,18 +171,33 @@ class State(Board):
     def valid_choices(self):
         if self._valid_choices is None:
             self._valid_choices = []
-            next_starts = []
-            for i in range(self.M):
-                for j in range(self.N):
-                    if self._next_side.func(self[i][j]):
-                        next_starts.append((i, j))
-            vectors = sum(([(s, t) for t in self._targets(s)] for s in next_starts), [])
+            vectors = sum(([(s, t) for t in self._targets(s)] for s in self.self_pieces), [])
             for v in vectors:
                 try:
                     self._valid_choices.append(self.is_valid(v))
                 except ValueError:
                     pass
         return self._valid_choices
+
+    @property
+    def self_pieces(self):
+        if self._self_pieces is None:
+            self._self_pieces = []
+            for i in range(self.M):
+                for j in range(self.N):
+                    if self._next_side.func(self[i][j]):
+                        self._self_pieces.append((i, j))
+        return self._self_pieces
+
+    @property
+    def oppo_pieces(self):
+        if self._oppo_pieces is None:
+            self._oppo_pieces = []
+            for i in range(self.M):
+                for j in range(self.N):
+                    if self._next_side.OPPONENT.func(self[i][j]):
+                        self._oppo_pieces.append((i, j))
+        return self._oppo_pieces
 
     @property
     def legal_choices(self):
@@ -202,11 +219,11 @@ class State(Board):
         i, j = tup
         pawn_targets = []
         if self._general_position(self._next_side)[0] in (0, 1, 2):
-            pawn_targets.append((i+1, j))
+            pawn_targets.append((i + 1, j))
             if i >= 5:
-                pawn_targets.append((i, j+1), (i, j-1))
+                pawn_targets.extend([(i, j + 1), (i, j - 1)])
         if self._general_position(self._next_side)[0] in (7, 8, 9):
-            pawn_targets.append((i-1, j))
+            pawn_targets.append((i - 1, j))
             if i <= 4:
-                pawn_targets.append((i, j + 1), (i, j - 1))
+                pawn_targets.extend([(i, j + 1), (i, j - 1)])
         return pawn_targets
