@@ -68,6 +68,10 @@ class Board:
         board[i_s][j_s] = " "
         return self.__class__(tuple(''.join(line) for line in board), self._next_side.OPPONENT)
 
+    @classmethod
+    def create_from_board(cls, board, next_side):
+        return cls(board, next_side)
+
     def _occupation(self, tup):
         i, j = tup
         return self[i][j]

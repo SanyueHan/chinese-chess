@@ -1,18 +1,19 @@
 
 
-display upgrade:
+display:
 1. use chinese tab characters to draw the line on board
 2. configurable board color, piece color
 
-function:
+game:
 1. five character input
 2. input by coordinate
-3. revert
+3. ai give hint
 4. save the game
 5. load from pre-saved games
-6. draw decision and full rules: 增加长将检查
-7. ai give hint
-8. use api to record player action remotely
+6. use api to record player action remotely
+
+core:
+draw decision and long attack
 
 code:
 optimise speed using switch case

@@ -42,7 +42,14 @@ class Game:
                 self._winner = self._state.next_side.OPPONENT
                 return
             if command.lower() == "revert":
-                pass
+                if len(self._history) >= 2:
+                    self._history.pop()
+                    self._state = self._state.create_from_board(self._history.pop(), self._state.next_side)
+                    print("Reverted to two steps before. ")
+                    print(self._state.display)
+                else:
+                    print("Unable to revert. ")
+                continue
             try:
                 vector = self._state.parse(command)
                 vector = self._state.is_valid(vector)
@@ -50,12 +57,12 @@ class Game:
                 result.is_legal()
                 self._history.append(self._state.board)
                 self._state = result
+                print(self._state.display)
                 break
             except ValueError as err:
                 print(err)
                 print("Enter --help or -h for help. ")
                 continue
-        print(self._state.display)
 
     def _machine_move(self):
         print("Machine is thinking...")
