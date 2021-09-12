@@ -1,18 +1,19 @@
 from constants import Role, TURN
 from constants.help import HELP
-from core.random_player import *
-from core.pieces_score_player import *
+from ai.random_player import *
+from ai.score_player import *
+from core.state import State
 
-
-STRATEGIES = {
-    0: RandomPlayer,
-    1: PiecesScorePlayer
+ARTIFICIAL_INTELLIGENCES = {
+    0: RandomRecommender,
+    1: ScoreRecommender
 }
 
 
 class Game:
     def __init__(self, role, ai_level, developer_mode=False):
-        self._state = STRATEGIES[ai_level](role.init, next_side=Role.OFFENSIVE)
+        self._state = State(role.init, next_side=Role.OFFENSIVE)
+        self._recommender = ARTIFICIAL_INTELLIGENCES[ai_level]
         self._play_modes = {
             Role.OFFENSIVE: self._machine_move,
             Role.DEFENSIVE: self._machine_move
@@ -68,7 +69,7 @@ class Game:
 
     def _machine_move(self):
         print("Machine is thinking...")
-        result = self._state.strategy()
+        result = self._recommender(self._state).strategy()
         self._history.append(self._state.board)
         self._state = result
         print(self._state.display)

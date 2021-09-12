@@ -26,6 +26,7 @@ class Board:
         self._rows = None
         self._cols = None
         self._generals = {}
+        self._pieces = {}
 
     def __iter__(self):
         return iter(self._board)
@@ -77,7 +78,7 @@ class Board:
         return self[i][j]
 
     @staticmethod
-    def _side(piece):
+    def _get_side_for_piece(piece):
         if piece.islower():
             return Role.OFFENSIVE
         if piece.isupper():
@@ -93,9 +94,13 @@ class Board:
                             break
                         else:
                             self._generals[side.OPPONENT] = (i, j)
-        try:
-            return self._generals[side]
-        except KeyError as e:
-            print(self.display)
-            raise e
+        return self._generals[side]
 
+    def pieces(self, side: Role):
+        if side not in self._pieces:
+            self._pieces[side] = {}
+            for i in range(self.M):
+                for j in range(self.N):
+                    if side.func(self[i][j]):
+                        self._pieces[side][(i, j)] = self[i][j]
+        return self._pieces[side]

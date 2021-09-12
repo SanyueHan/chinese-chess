@@ -13,8 +13,6 @@ class State(Board):
         # None for never calculated, [] for calculated but no result
         self._valid_choices = None
         self._legal_choices = None
-        self._self_pieces = None
-        self._oppo_pieces = None
 
     def parse(self, command):
         """
@@ -130,8 +128,8 @@ class State(Board):
             raise ValueError(f"Invalid movement, {DECODE[piece_s]} exceeds boundary. ")
         piece_f = self[i_f][j_f]
 
-        side_s = State._side(piece_s)
-        side_f = State._side(piece_f)
+        side_s = State._get_side_for_piece(piece_s)
+        side_f = State._get_side_for_piece(piece_f)
         if side_s == side_f:
             raise ValueError(f"Invalid movement, {DECODE[piece_s]} attacks friend. ")
 
@@ -171,33 +169,13 @@ class State(Board):
     def valid_choices(self):
         if self._valid_choices is None:
             self._valid_choices = []
-            vectors = sum(([(s, t) for t in self._targets(s)] for s in self.self_pieces), [])
+            vectors = sum(([(k, t) for t in self._targets(k, v)] for k, v in self.pieces(self._next_side).items()), [])
             for v in vectors:
                 try:
                     self._valid_choices.append(self.is_valid(v))
                 except ValueError:
                     pass
         return self._valid_choices
-
-    @property
-    def self_pieces(self):
-        if self._self_pieces is None:
-            self._self_pieces = []
-            for i in range(self.M):
-                for j in range(self.N):
-                    if self._next_side.func(self[i][j]):
-                        self._self_pieces.append((i, j))
-        return self._self_pieces
-
-    @property
-    def oppo_pieces(self):
-        if self._oppo_pieces is None:
-            self._oppo_pieces = []
-            for i in range(self.M):
-                for j in range(self.N):
-                    if self._next_side.OPPONENT.func(self[i][j]):
-                        self._oppo_pieces.append((i, j))
-        return self._oppo_pieces
 
     @property
     def legal_choices(self):
@@ -212,8 +190,7 @@ class State(Board):
                     pass
         return self._legal_choices
 
-    def _targets(self, tup) -> List[Tuple]:
-        piece = self._occupation(tup)
+    def _targets(self, tup, piece) -> List[Tuple]:
         if fun := TARGETS.get(piece.lower()):
             return fun(tup)
         i, j = tup
