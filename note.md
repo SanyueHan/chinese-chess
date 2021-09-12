@@ -16,13 +16,12 @@ core:
 draw decision and long attack
 
 code:
-merge valid_choices/legal_choices logic
+dev mode for debug
+optimise legal_choices logic
+try to remove next_side attribute
 optimise speed using switch case
 
 algorithm:
-short term: movement choices
-medium term: controlling point number
-long term: pieces strength
+human expert manual data
+genetic algorithm arguments optimisation
 
-iteration:
-genetic algorithm

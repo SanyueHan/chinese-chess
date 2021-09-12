@@ -3,6 +3,7 @@ from enum import Enum
 from .boards import OFFENSIVE_INIT, DEFENSIVE_INIT
 from .color import COLOR_WARM, COLOR_COOL
 from .coding import ENCODE, DECODE
+from .help import HELP
 
 
 class Role(Enum):

@@ -10,9 +10,8 @@ from rules.paths import PATH
 class State(Board):
     def __init__(self, board: Tuple[str], next_side: Role):
         super().__init__(board, next_side)
-        # None for never calculated, [] for calculated but no result
-        self._valid_choices = None
-        self._legal_choices = None
+        self._valid_choices = {}
+        self._legal_choices = None  # None for never calculated, [] for calculated but no result
 
     def parse(self, command):
         """
@@ -160,46 +159,45 @@ class State(Board):
             path = col[s + 1:e]
             if len(path) == path.count(' '):
                 raise ValueError(f"Invalid movement: General exposed. ")
-
-        for vector in self.valid_choices:
+        for vector in self.valid_choices(self._next_side):
             if vector[1] == oppo_general:
                 raise ValueError(f"Invalid movement: General will be killed. ")
+        return self
 
-    @property
-    def valid_choices(self):
-        if self._valid_choices is None:
-            self._valid_choices = []
-            vectors = sum(([(k, t) for t in self._targets(k, v)] for k, v in self.pieces(self._next_side).items()), [])
+    def valid_choices(self, side):
+        if side not in self._valid_choices:
+            self._valid_choices[side] = []
+            vectors = sum(([(k, t) for t in self._targets(k, side)] for k in self.pieces(side)), [])
             for v in vectors:
                 try:
-                    self._valid_choices.append(self.is_valid(v))
+                    self._valid_choices[side].append(self.is_valid(v))
                 except ValueError:
                     pass
-        return self._valid_choices
+        return self._valid_choices[side]
 
     @property
     def legal_choices(self):
         if self._legal_choices is None:
             self._legal_choices = []
-            for vector in self.valid_choices:
+            for vector in self.valid_choices(self._next_side):
                 result = self.create_from_vector(vector)
                 try:
-                    result.is_legal()
-                    self._legal_choices.append(result)
+                    self._legal_choices.append(result.is_legal())
                 except ValueError:
                     pass
         return self._legal_choices
 
-    def _targets(self, tup, piece) -> List[Tuple]:
+    def _targets(self, tup, side) -> List[Tuple]:
+        piece = self._occupation(tup)
         if fun := TARGETS.get(piece.lower()):
             return fun(tup)
         i, j = tup
         pawn_targets = []
-        if self._general_position(self._next_side)[0] in (0, 1, 2):
+        if self._general_position(side)[0] in (0, 1, 2):
             pawn_targets.append((i + 1, j))
             if i >= 5:
                 pawn_targets.extend([(i, j + 1), (i, j - 1)])
-        if self._general_position(self._next_side)[0] in (7, 8, 9):
+        if self._general_position(side)[0] in (7, 8, 9):
             pawn_targets.append((i - 1, j))
             if i <= 4:
                 pawn_targets.extend([(i, j + 1), (i, j - 1)])

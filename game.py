@@ -1,8 +1,6 @@
-from constants import Role, TURN
-from constants.help import HELP
-from ai.random_player import *
-from ai.score_player import *
+from constants import Role, TURN, HELP
 from core.state import State
+from ai import *
 
 ARTIFICIAL_INTELLIGENCES = {
     0: RandomRecommender,
