@@ -6,7 +6,7 @@ from constants import Role
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', '--r', type=str, default="OFFENSIVE", help='choose the role')
-    parser.add_argument('-d', '--d', type=int, default=1, help='configure the machine intelligence')
+    parser.add_argument('-d', '--d', type=int, default=2, help='configure the machine intelligence')
     args = parser.parse_args()
 
     game = Game(Role[args.r], args.d)

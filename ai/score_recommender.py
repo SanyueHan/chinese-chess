@@ -13,10 +13,10 @@ EXISTENCE_SCORE_TABLE = {
 
 class ScoreRecommender(Recommender):
     def strategy(self):
-        return min(self._state.legal_choices, key=lambda x: self._score(x))
+        return min(self._state.legal_choices, key=lambda x: self.score(x))
 
     @staticmethod
-    def _score(state):
+    def score(state):
         # Power score is the sum of total strength of a side.
         # It quantifies the absolute power in long term.
         self_power = sum(EXISTENCE_SCORE_TABLE[p.lower()] for p in state.pieces(state.next_side).values())

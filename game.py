@@ -4,7 +4,8 @@ from ai import *
 
 ARTIFICIAL_INTELLIGENCES = {
     0: RandomRecommender,
-    1: ScoreRecommender
+    1: ScoreRecommender,
+    2: TreeSearchRecommender
 }
 
 
