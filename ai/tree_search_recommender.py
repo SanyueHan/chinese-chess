@@ -1,4 +1,5 @@
 from ai.score_recommender import ScoreRecommender
+from cache import cache
 
 
 class Node:
@@ -8,7 +9,7 @@ class Node:
 
     def build(self, depth):
         if depth:
-            self._children = [Node(state) for state in self._state.legal_choices]
+            self._children = [Node(state) for state in cache.legal_movements(self._state)]
             for child in self._children:
                 child.build(depth - 1)
 

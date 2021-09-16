@@ -11,7 +11,6 @@ class State(Board):
     def __init__(self, board: Tuple[str], next_side: Role):
         super().__init__(board, next_side)
         self._valid_choices = {}
-        self._legal_choices = None  # None for never calculated, [] for calculated but no result
 
     def parse(self, command):
         """
@@ -174,18 +173,6 @@ class State(Board):
                 except ValueError:
                     pass
         return self._valid_choices[side]
-
-    @property
-    def legal_choices(self):
-        if self._legal_choices is None:
-            self._legal_choices = []
-            for vector in self.valid_choices(self._next_side):
-                result = self.create_from_vector(vector)
-                try:
-                    self._legal_choices.append(result.is_legal())
-                except ValueError:
-                    pass
-        return self._legal_choices
 
     def _targets(self, tup, side) -> List[Tuple]:
         piece = self._occupation(tup)

@@ -1,4 +1,5 @@
 from ai.base import Recommender
+from cache import cache
 
 EXISTENCE_SCORE_TABLE = {
     'p': 2,
@@ -13,7 +14,7 @@ EXISTENCE_SCORE_TABLE = {
 
 class ScoreRecommender(Recommender):
     def strategy(self):
-        return min(self._state.legal_choices, key=lambda x: self.score(x))
+        return min(cache.legal_movements(self._state), key=lambda x: self.score(x))
 
     @staticmethod
     def score(state):
@@ -29,6 +30,6 @@ class ScoreRecommender(Recommender):
         # It will only resulted in 0 if no legal choice found,
         # which means that the next player has already lost the game.
         # This score is necessary for the final phase.
-        alive_score = min(1, len(state.legal_choices))
+        alive_score = min(1, len(cache.legal_movements(state)))
 
         return alive_score * (self_agile + self_power) / (oppo_agile + oppo_power)

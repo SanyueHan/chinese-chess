@@ -1,6 +1,7 @@
 from constants import Role, TURN, HELP
 from core.state import State
 from ai import *
+from cache import cache
 
 ARTIFICIAL_INTELLIGENCES = {
     0: RandomRecommender,
@@ -28,7 +29,7 @@ class Game:
         print(self._state.display)
         while self._winner is None:
             side = TURN[len(self._history) % 2]
-            if not self._state.legal_choices:
+            if not cache.legal_movements(self._state):
                 self._winner = side.OPPONENT
                 break
             self._play_modes[side]()
@@ -72,3 +73,4 @@ class Game:
         self._history.append(self._state.board)
         self._state = result
         print(self._state.display)
+        print(cache.size, cache.memory)

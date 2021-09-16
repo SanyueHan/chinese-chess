@@ -34,6 +34,12 @@ class Board:
     def __getitem__(self, item):
         return self._board[item]
 
+    def __hash__(self):
+        return hash(self._board) + hash(self._next_side)
+
+    def __eq__(self, other):
+        return self._board == other.board and self._next_side == other.next_side
+
     @property
     def next_side(self):
         return self._next_side
