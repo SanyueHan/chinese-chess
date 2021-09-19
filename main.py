@@ -1,13 +1,11 @@
 import argparse
 from game import Game
-from constants import Role
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-r', '--r', type=str, default="OFFENSIVE", help='choose the role')
-    parser.add_argument('-d', '--d', type=int, default=2, help='configure the machine intelligence')
+    parser.add_argument('-d', type=str, default="", help='set developer mode')
     args = parser.parse_args()
 
-    game = Game(Role[args.r], args.d)
+    game = Game(developer_mode=bool(args.d))
     game.play()

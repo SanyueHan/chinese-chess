@@ -11,17 +11,25 @@ ARTIFICIAL_INTELLIGENCES = {
 
 
 class Game:
-    def __init__(self, role, ai_level, developer_mode=False):
-        self._state = State(role.init, next_side=Role.OFFENSIVE)
+    def __init__(self, role=Role.OFFENSIVE, ai_level=2, developer_mode=True):
+        while role is None:
+            role_ = input("Which role do you prefer: OFFENSIVE or DEFENSIVE? \n")
+            try:
+                role = Role[role_]
+            except KeyError:
+                print("invalid choice, please input again. ")
+        while ai_level is None:
+            level = input("Enter a number between 0-2 to configure the ai intelligence: ")
+            try:
+                ai_level = int(level)
+                assert ai_level in ARTIFICIAL_INTELLIGENCES
+            except (ValueError, AssertionError):
+                print("invalid number, please input again. ")
         self._recommender = ARTIFICIAL_INTELLIGENCES[ai_level]
-        self._play_modes = {
-            Role.OFFENSIVE: self._machine_move,
-            Role.DEFENSIVE: self._machine_move
-        }
-        if isinstance(role, Role):
-            self._play_modes[role] = self._mankind_move
+        self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
         self._winner = None
+        self._state = State(role.init, next_side=Role.OFFENSIVE)
         self._dev = developer_mode
 
     def play(self):
@@ -32,7 +40,13 @@ class Game:
             if not cache.legal_movements(self._state):
                 self._winner = side.OPPONENT
                 break
-            self._play_modes[side]()
+            if move := self._play_modes[side]():
+                self._history.append(self._state.board)
+                self._state = move
+                print(move.display)
+            else:
+                print(f"{side} resigned. ")
+                self._winner = side.OPPONENT
         print(f"Winner: {self._winner}")
 
     def _mankind_move(self):
@@ -58,10 +72,7 @@ class Game:
                 vector = self._state.is_valid(vector)
                 result = self._state.create_from_vector(vector)
                 result.is_legal()
-                self._history.append(self._state.board)
-                self._state = result
-                print(self._state.display)
-                break
+                return result
             except ValueError as err:
                 print(err)
                 print("Enter --help or -h for help. ")
@@ -70,7 +81,6 @@ class Game:
     def _machine_move(self):
         print("Machine is thinking...")
         result = self._recommender.strategy(self._state)
-        self._history.append(self._state.board)
-        self._state = result
-        print(self._state.display)
-        print(cache.size, cache.memory)
+        if self._dev:
+            print(cache.size, cache.memory)
+        return result
