@@ -15,11 +15,17 @@ EXISTENCE_SCORE_TABLE = {
 class ScoreRecommender(Recommender):
     def __init__(self, power=2):
         self._power_argument = power
+        self._cache = {}
 
     def strategy(self, state):
         return min(cache.legal_movements(state), key=lambda x: self.score(x))
 
     def score(self, state):
+        if state not in self._cache:
+            self._cache[state] = self._score(state)
+        return self._cache[state]
+
+    def _score(self, state):
         # Power score is the sum of total strength of a side.
         # It quantifies the absolute power in long term.
         self_power = sum(EXISTENCE_SCORE_TABLE[p.lower()] for p in state.pieces(state.next_side).values())
