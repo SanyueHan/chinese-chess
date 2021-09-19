@@ -4,9 +4,9 @@ from ai import *
 from cache import cache
 
 ARTIFICIAL_INTELLIGENCES = {
-    0: RandomRecommender,
-    1: ScoreRecommender,
-    2: TreeSearchRecommender
+    0: RandomRecommender(),
+    1: ScoreRecommender(),
+    2: TreeSearchRecommender()
 }
 
 
@@ -69,7 +69,7 @@ class Game:
 
     def _machine_move(self):
         print("Machine is thinking...")
-        result = self._recommender(self._state).strategy()
+        result = self._recommender.strategy(self._state)
         self._history.append(self._state.board)
         self._state = result
         print(self._state.display)

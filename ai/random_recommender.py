@@ -7,5 +7,5 @@ random.seed(0)
 
 
 class RandomRecommender(Recommender):
-    def strategy(self):
-        return random.choice(cache.legal_movements(self._state))
+    def strategy(self, state):
+        return random.choice(cache.legal_movements(state))
