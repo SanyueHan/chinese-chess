@@ -45,6 +45,7 @@ class State:
     def __eq__(self, other):
         return self._board == other.board and self._next_side == other.next_side
 
+    @property
     def feature(self):
         return f"{self._next_side}{self._board}"
 
