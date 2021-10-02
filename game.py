@@ -1,31 +1,17 @@
 from constants import Role, TURN, HELP
 from core.state import State
-from ai import *
-from cache import cache
-
-ARTIFICIAL_INTELLIGENCES = {
-    0: RandomRecommender(),
-    1: ScoreRecommender(),
-    2: TreeSearchRecommender()
-}
+from ai.tree_search_recommender import TreeSearchRecommender
 
 
 class Game:
-    def __init__(self, role=Role.OFFENSIVE, ai_level=2, developer_mode=True):
+    def __init__(self, role=Role.OFFENSIVE, developer_mode=True):
         while role is None:
             role_ = input("Which role do you prefer: OFFENSIVE or DEFENSIVE? \n")
             try:
                 role = Role[role_]
             except KeyError:
                 print("invalid choice, please input again. ")
-        while ai_level is None:
-            level = input("Enter a number between 0-2 to configure the ai intelligence: ")
-            try:
-                ai_level = int(level)
-                assert ai_level in ARTIFICIAL_INTELLIGENCES
-            except (ValueError, AssertionError):
-                print("invalid number, please input again. ")
-        self._recommender = ARTIFICIAL_INTELLIGENCES[ai_level]
+        self._recommender = TreeSearchRecommender()
         self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
         self._winner = None
@@ -37,7 +23,7 @@ class Game:
         print(self._state.display)
         while self._winner is None:
             side = TURN[len(self._history) % 2]
-            if not cache.legal_movements(self._state):
+            if self._recommender.top_score(self._state, 2) == 0:
                 self._winner = side.OPPONENT
                 break
             if move := self._play_modes[side]():
@@ -47,6 +33,10 @@ class Game:
             else:
                 print(f"{side} resigned. ")
                 self._winner = side.OPPONENT
+            if self._dev:
+                print(f"cache hit: {self._state.HIT}")
+                print(f"cache miss: {self._state.MISS}")
+                print(f"cache size: {len(self._state.CACHE)}")
         print(f"Winner: {self._winner}")
 
     def _mankind_move(self):
@@ -61,7 +51,7 @@ class Game:
             if command.lower() == "revert":
                 if len(self._history) >= 2:
                     self._history.pop()
-                    self._state = self._state.create_from_board(self._history.pop(), self._state.next_side)
+                    self._state = State.create_with_cache(self._history.pop(), self._state.next_side)
                     print("Reverted to two steps before. ")
                     print(self._state.display)
                 else:
@@ -71,7 +61,8 @@ class Game:
                 vector = self._state.parse(command)
                 vector = self._state.is_valid(vector)
                 result = self._state.create_from_vector(vector)
-                result.is_legal()
+                if self._recommender.top_score(result, 1) == float('inf'):
+                    raise ValueError(f"Invalid movement: General will be killed. ")
                 return result
             except ValueError as err:
                 print(err)
@@ -81,6 +72,4 @@ class Game:
     def _machine_move(self):
         print("Machine is thinking...")
         result = self._recommender.strategy(self._state)
-        if self._dev:
-            print(cache.size, cache.memory)
         return result

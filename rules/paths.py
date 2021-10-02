@@ -1,6 +1,6 @@
 
 
-def rook_cannon_path(vector):
+def straight_path(vector):
     s, f = vector
     i_s, j_s = s
     i_f, j_f = f
@@ -28,11 +28,11 @@ def minister_path(vector):
 
 
 PATH = {
-    'r': rook_cannon_path,
+    'r': straight_path,
     'k': knight_path,
-    'c': rook_cannon_path,
+    'c': straight_path,
     'm': minister_path,
     'a': lambda v: [],
-    'g': lambda v: [],
+    'g': straight_path,
     'p': lambda v: [],
 }

@@ -1,9 +1,7 @@
-from ai.base import Recommender
-from ai.score_recommender import ScoreRecommender
-from cache import cache
+from ai.score_calculator import ScoreCalculator
 
 
-get_score = ScoreRecommender().score
+get_score = ScoreCalculator().score
 
 
 class Node:
@@ -13,23 +11,24 @@ class Node:
 
     def build(self, depth):
         if depth:
-            self._children = [Node(state) for state in cache.legal_movements(self._state)]
+            self._children = [Node(state) for state in self._state.valid_choices(self._state.next_side)]
             for child in self._children:
                 child.build(depth - 1)
 
-    def search(self, pick=False):
+    def search(self):
+        """
+        :return: the index of the child who returns the top score, the top score, the result that gives the top score
+        """
         if not self._children:
-            return self._state
-        choices = [child.search() for child in self._children]
-        choice_scores = [(get_score(choice), choice) for choice in choices]
-        choice_scores = [(v, s) if s.next_side == self._state.next_side else (self.reciprocal(v), s)
-                         for v, s in choice_scores]
-        best = max(choice_scores, key=lambda tup: tup[0])
-        if pick:
-            index = choice_scores.index(best)
-            return self._children[index].state
-        else:
-            return best[1]
+            return None, None, self._state
+        choices = [child.search()[2] for child in self._children]
+        choices = [(get_score(choice), choice) for choice in choices]
+        choices = [(v, s) if s.next_side == self._state.next_side else (self.reciprocal(v), s) for v, s in choices]
+        best = max(choices, key=lambda tup: tup[0])
+        return choices.index(best), best[0], best[1]
+
+    def get_child(self, index):
+        return self._children[index]
 
     @staticmethod
     def reciprocal(score):
@@ -42,10 +41,18 @@ class Node:
         return self._state
 
 
-class TreeSearchRecommender(Recommender):
-    DEPTH = 2
+class TreeSearchRecommender:
+    DEPTH = 3
 
     def strategy(self, state):
         root = Node(state)
         root.build(self.DEPTH)
-        return root.search(True)
+        return root.get_child(root.search()[0]).state
+
+    @staticmethod
+    def top_score(state, depth):
+        root = Node(state)
+        root.build(depth)
+        return root.search()[1]
+
+

@@ -1,16 +1,125 @@
-from typing import List
+from typing import Tuple, List
 
-from constants import DECODE, ENCODE, SIDE
-from core.board import *
+from constants import Role, DISPLAY, ENCODE, DECODE, SIDE
 from rules.boundaries import BOUNDARY
-from rules.targets import TARGETS
 from rules.paths import PATH
+from rules.targets import TARGETS
+
+PAWN = set("pP")
+GENERAL = set("gG")
+SLOW_PIECES = PAWN | GENERAL
+ROOK = set("rR")
+CANNON = set("cC")
+FAST_PIECES = ROOK | CANNON
+STRAIGHT_PIECES = SLOW_PIECES | FAST_PIECES
+KNIGHT = set("kK")
+MINISTER = set("mM")
+ASSISTANT = set("aA")
+DIAGONAL_PIECES = KNIGHT | MINISTER | ASSISTANT
+PIECES = STRAIGHT_PIECES | DIAGONAL_PIECES
 
 
-class State(Board):
+class State:
+    CACHE = {}
+    HIT = 0
+    MISS = 0
+
     def __init__(self, board: Tuple[str], next_side: Role):
-        super().__init__(board, next_side)
+        self._next_side = next_side
+        self._board = board
+        self._rows = None
+        self._cols = None
+        self._generals = {}
+        self._pieces = {}
         self._valid_choices = {}
+
+    def __iter__(self):
+        return iter(self._board)
+
+    def __getitem__(self, item):
+        return self._board[item]
+
+    def __hash__(self):
+        return hash(self._board) + hash(self._next_side)
+
+    def __eq__(self, other):
+        return self._board == other.board and self._next_side == other.next_side
+
+    def feature(self):
+        return f"{self._next_side}{self._board}"
+
+    @property
+    def next_side(self):
+        return self._next_side
+
+    @property
+    def board(self):
+        return self._board
+
+    @property
+    def rows(self):
+        if not self._rows:
+            self._rows = [row for row in self._board]
+        return self._rows
+
+    @property
+    def cols(self):
+        if not self._cols:
+            self._cols = [''.join(row[j] for row in self.rows) for j in range(9)]
+        return self._cols
+
+    @property
+    def display(self):
+        shift = " " * 50
+        lines = ["一二三四五六七八九", *[''.join(DISPLAY[c] for c in row) for row in self.rows], "九八七六五四三二一"]
+        return f'\n'.join(shift + line for line in lines)
+
+    def create_from_vector(self, vector):
+        start, final = vector
+        i_s, j_s = start
+        i_f, j_f = final
+        board = [list(line) for line in self]
+        board[i_f][j_f] = board[i_s][j_s]
+        board[i_s][j_s] = " "
+        return self.create_with_cache(tuple(''.join(line) for line in board), self._next_side.OPPONENT)
+
+    @classmethod
+    def create_with_cache(cls, board, next_side):
+        new = cls(board, next_side)
+        if new.feature in cls.CACHE:
+            cls.HIT += 1
+            return cls.CACHE[new.feature]
+        else:
+            cls.CACHE[new.feature] = new
+            cls.MISS += 1
+            return new
+
+    def occupation(self, tup):
+        i, j = tup
+        return self[i][j]
+
+    def general_position(self, side: Role):
+        if side not in self._generals:
+            for i in (0, 1, 2, 7, 8, 9):
+                for j in (3, 4, 5):
+                    if self[i][j] in GENERAL:
+                        if side.func(self[i][j]):
+                            self._generals[side] = (i, j)
+                            return i, j
+                        else:
+                            self._generals[side.OPPONENT] = (i, j)
+            else:
+                self._generals[side] = None
+        return self._generals[side]
+
+    def pieces(self, side: Role):
+        if side not in self._pieces:
+            self._pieces[side] = {}
+            for i in range(10):
+                for j in range(9):
+                    if side.func(self[i][j]):
+                        self._pieces[side][(i, j)] = self[i][j]
+        return self._pieces[side]
 
     def parse(self, command):
         """
@@ -35,10 +144,10 @@ class State(Board):
                     raise ValueError(f"Invalid command: {''.join(DECODE[c] for c in movement)}, "
                                      f"multiple {DECODE[piece]} in column {p}")
             i = self.cols[-p].index(piece)
-            j = self.N - p
+            j = 9 - p
 
         elif (piece := movement[1]) in PIECES and (position := movement[0]) in "^$":
-            for j in range(self.N):
+            for j in range(9):
                 col = self.cols[j]
                 if col.count(piece) == 2:
                     i = col.find(piece) if position == "^" else col.rfind(piece)
@@ -109,6 +218,44 @@ class State(Board):
 
         return start, final
 
+    def valid_choices(self, side):
+        if side not in self._valid_choices:
+            self._valid_choices[side] = []
+            if self.general_position(self._next_side) is None:
+                return self._valid_choices[side]
+            vectors = sum(([(k, t) for t in self._targets(k)] for k in self.pieces(side)), [])
+            for v in vectors:
+                try:
+                    self._valid_choices[side].append(self.create_from_vector(self.is_valid(v)))
+                except ValueError:
+                    pass
+        return self._valid_choices[side]
+
+    def _targets(self, tup) -> List[Tuple]:
+        piece = self.occupation(tup)
+        if fun := TARGETS.get(piece.lower()):
+            return fun(tup)
+        i, j = tup
+        side = SIDE[piece]
+        if piece in PAWN:
+            pawn_targets = []
+            if self.general_position(side)[0] in (0, 1, 2):
+                pawn_targets.append((i + 1, j))
+                if i >= 5:
+                    pawn_targets.extend([(i, j + 1), (i, j - 1)])
+            if self.general_position(side)[0] in (7, 8, 9):
+                pawn_targets.append((i - 1, j))
+                if i <= 4:
+                    pawn_targets.extend([(i, j + 1), (i, j - 1)])
+            return pawn_targets
+        if piece in GENERAL:
+            general_targets = [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
+            i_, j_ = self.general_position(side.OPPONENT)
+            if j == j_:
+                general_targets.append((i_, j_))
+            return general_targets
+        return []
+
     def is_valid(self, vector):
         """
         check whether the displacement is performable by ensuring that:
@@ -140,50 +287,3 @@ class State(Board):
             if num_of_obstacle != 0:
                 raise ValueError(f"Invalid path for {DECODE[piece_s]}. ")
         return vector
-
-    def is_legal(self):
-        """
-        ensure the result will not:
-        1. expose one general to the other
-        2. enable the next player killing the other's general directly.
-        """
-        self_general = self.general_position(self._next_side)
-        oppo_general = self.general_position(self._next_side.OPPONENT)
-        if self_general[1] == oppo_general[1]:
-            col = self.cols[self_general[1]]
-            s = min(self_general[0], oppo_general[0])
-            e = max(self_general[0], oppo_general[0])
-            path = col[s + 1:e]
-            if len(path) == path.count(' '):
-                raise ValueError(f"Invalid movement: General exposed. ")
-        for vector in self.valid_choices(self._next_side):
-            if vector[1] == oppo_general:
-                raise ValueError(f"Invalid movement: General will be killed. ")
-        return self
-
-    def valid_choices(self, side):
-        if side not in self._valid_choices:
-            self._valid_choices[side] = []
-            vectors = sum(([(k, t) for t in self._targets(k, side)] for k in self.pieces(side)), [])
-            for v in vectors:
-                try:
-                    self._valid_choices[side].append(self.is_valid(v))
-                except ValueError:
-                    pass
-        return self._valid_choices[side]
-
-    def _targets(self, tup, side) -> List[Tuple]:
-        piece = self.occupation(tup)
-        if fun := TARGETS.get(piece.lower()):
-            return fun(tup)
-        i, j = tup
-        pawn_targets = []
-        if self.general_position(side)[0] in (0, 1, 2):
-            pawn_targets.append((i + 1, j))
-            if i >= 5:
-                pawn_targets.extend([(i, j + 1), (i, j - 1)])
-        if self.general_position(side)[0] in (7, 8, 9):
-            pawn_targets.append((i - 1, j))
-            if i <= 4:
-                pawn_targets.extend([(i, j + 1), (i, j - 1)])
-        return pawn_targets
