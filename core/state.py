@@ -31,7 +31,7 @@ class State:
         self._cols = None
         self._generals = {}
         self._pieces = {}
-        self._valid_choices = {}
+        self._valid_choices = None
 
     def __iter__(self):
         return iter(self._board)
@@ -218,18 +218,19 @@ class State:
 
         return start, final
 
-    def valid_choices(self, side):
-        if side not in self._valid_choices:
-            self._valid_choices[side] = []
+    @property
+    def valid_choices(self):
+        if self._valid_choices is None:
+            self._valid_choices = []
             if self.general_position(self._next_side) is None:
-                return self._valid_choices[side]
-            vectors = sum(([(k, t) for t in self._targets(k)] for k in self.pieces(side)), [])
+                return self._valid_choices
+            vectors = sum(([(k, t) for t in self._targets(k)] for k in self.pieces(self._next_side)), [])
             for v in vectors:
                 try:
-                    self._valid_choices[side].append(self.create_from_vector(self.is_valid(v)))
+                    self._valid_choices.append(self.create_from_vector(self.is_valid(v)))
                 except ValueError:
                     pass
-        return self._valid_choices[side]
+        return self._valid_choices
 
     def _targets(self, tup) -> List[Tuple]:
         piece = self.occupation(tup)

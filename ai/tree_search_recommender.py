@@ -11,7 +11,7 @@ class Node:
 
     def build(self, depth):
         if depth:
-            self._children = [Node(state) for state in self._state.valid_choices(self._state.next_side)]
+            self._children = [Node(state) for state in self._state.valid_choices]
             for child in self._children:
                 child.build(depth - 1)
 
