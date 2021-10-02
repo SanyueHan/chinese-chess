@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 from .boards import OFFENSIVE_INIT, DEFENSIVE_INIT
@@ -54,3 +55,6 @@ for k in DECODE:
         SIDE[k] = Role.OFFENSIVE
     if k.isalpha() and k.isupper():
         SIDE[k] = Role.DEFENSIVE
+
+
+DEVELOPER_MODE = bool(os.environ.get("DEV_MODE"))

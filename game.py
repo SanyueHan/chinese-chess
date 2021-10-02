@@ -1,10 +1,10 @@
-from constants import Role, TURN, HELP
+from constants import Role, TURN, HELP, DEVELOPER_MODE
 from core.state import State
 from ai.tree_search_recommender import TreeSearchRecommender
 
 
 class Game:
-    def __init__(self, role=Role.OFFENSIVE, developer_mode=True):
+    def __init__(self, role=Role.OFFENSIVE):
         while role is None:
             role_ = input("Which role do you prefer: OFFENSIVE or DEFENSIVE? \n")
             try:
@@ -16,7 +16,6 @@ class Game:
         self._history = []
         self._winner = None
         self._state = State(role.init, next_side=Role.OFFENSIVE)
-        self._dev = developer_mode
 
     def play(self):
         print(f"Welcome to Chinese Chess! ")
@@ -33,7 +32,7 @@ class Game:
             else:
                 print(f"{side} resigned. ")
                 self._winner = side.OPPONENT
-            if self._dev:
+            if DEVELOPER_MODE:
                 print(f"cache hit: {self._state.HIT}")
                 print(f"cache miss: {self._state.MISS}")
                 print(f"cache size: {len(self._state.CACHE)}")

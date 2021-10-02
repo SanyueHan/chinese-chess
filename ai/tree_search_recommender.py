@@ -1,5 +1,5 @@
 from ai.score_calculator import ScoreCalculator
-
+from constants import DEVELOPER_MODE
 
 get_score = ScoreCalculator().score
 
@@ -47,7 +47,12 @@ class TreeSearchRecommender:
     def strategy(self, state):
         root = Node(state)
         root.build(self.DEPTH)
-        return root.get_child(root.search()[0]).state
+        index, score, result = root.search()
+        if DEVELOPER_MODE:
+            print(f"The best score for {state.next_side} in a search of depth {self.DEPTH} is {score}")
+            print(f"The envisioned result is: ")
+            print(result.display)
+        return root.get_child(index).state
 
     @staticmethod
     def top_score(state, depth):
