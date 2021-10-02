@@ -46,3 +46,11 @@ for k, v in DECODE.items():
         DISPLAY[k] = COLOR_WARM(v)
     else:
         DISPLAY[k] = COLOR_COOL(v)
+
+
+SIDE = {}
+for k in DECODE:
+    if k.isalpha() and k.islower():
+        SIDE[k] = Role.OFFENSIVE
+    if k.isalpha() and k.isupper():
+        SIDE[k] = Role.DEFENSIVE

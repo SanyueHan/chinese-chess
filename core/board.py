@@ -79,18 +79,11 @@ class Board:
     def create_from_board(cls, board, next_side):
         return cls(board, next_side)
 
-    def _occupation(self, tup):
+    def occupation(self, tup):
         i, j = tup
         return self[i][j]
 
-    @staticmethod
-    def _get_side_for_piece(piece):
-        if piece.islower():
-            return Role.OFFENSIVE
-        if piece.isupper():
-            return Role.DEFENSIVE
-
-    def _general_position(self, side: Role):
+    def general_position(self, side: Role):
         if side not in self._generals:
             for i in (0, 1, 2, 7, 8, 9):
                 for j in (3, 4, 5):

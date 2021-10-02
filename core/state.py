@@ -1,6 +1,6 @@
 from typing import List
 
-from constants import DECODE, ENCODE
+from constants import DECODE, ENCODE, SIDE
 from core.board import *
 from rules.boundaries import BOUNDARY
 from rules.targets import TARGETS
@@ -126,20 +126,18 @@ class State(Board):
             raise ValueError(f"Invalid movement, {DECODE[piece_s]} exceeds boundary. ")
         piece_f = self[i_f][j_f]
 
-        side_s = State._get_side_for_piece(piece_s)
-        side_f = State._get_side_for_piece(piece_f)
-        if side_s == side_f:
+        if SIDE.get(piece_s, None) == SIDE.get(piece_f, None):
             raise ValueError(f"Invalid movement, {DECODE[piece_s]} attacks friend. ")
 
-        path = ''.join(self._occupation(point) for point in PATH[piece_s.lower()](vector))
-        obstacle = len(path) - path.count(' ')
+        path = ''.join(self.occupation(point) for point in PATH[piece_s.lower()](vector))
+        num_of_obstacle = len(path) - path.count(' ')
         if piece_s in CANNON and piece_f != ' ':
             # cannon is attacking, one obstacle should on the path
-            if obstacle != 1:
+            if num_of_obstacle != 1:
                 raise ValueError(f"Invalid path for {DECODE[piece_s]}. ")
         else:
             # cannon is not attacking or other pieces is moving or attacking, no obstacle should on the path
-            if obstacle != 0:
+            if num_of_obstacle != 0:
                 raise ValueError(f"Invalid path for {DECODE[piece_s]}. ")
         return vector
 
@@ -149,8 +147,8 @@ class State(Board):
         1. expose one general to the other
         2. enable the next player killing the other's general directly.
         """
-        self_general = self._general_position(self._next_side)
-        oppo_general = self._general_position(self._next_side.OPPONENT)
+        self_general = self.general_position(self._next_side)
+        oppo_general = self.general_position(self._next_side.OPPONENT)
         if self_general[1] == oppo_general[1]:
             col = self.cols[self_general[1]]
             s = min(self_general[0], oppo_general[0])
@@ -175,16 +173,16 @@ class State(Board):
         return self._valid_choices[side]
 
     def _targets(self, tup, side) -> List[Tuple]:
-        piece = self._occupation(tup)
+        piece = self.occupation(tup)
         if fun := TARGETS.get(piece.lower()):
             return fun(tup)
         i, j = tup
         pawn_targets = []
-        if self._general_position(side)[0] in (0, 1, 2):
+        if self.general_position(side)[0] in (0, 1, 2):
             pawn_targets.append((i + 1, j))
             if i >= 5:
                 pawn_targets.extend([(i, j + 1), (i, j - 1)])
-        if self._general_position(side)[0] in (7, 8, 9):
+        if self.general_position(side)[0] in (7, 8, 9):
             pawn_targets.append((i - 1, j))
             if i <= 4:
                 pawn_targets.extend([(i, j + 1), (i, j - 1)])
