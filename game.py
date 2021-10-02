@@ -1,21 +1,29 @@
-from constants import Role, TURN, HELP, DEVELOPER_MODE
+import os
+import time
+
+from constants import Role, TURN, HELP, DEVELOPER_MODE, BOARDS
 from core.state import State
 from ai.tree_search_recommender import TreeSearchRecommender
 
 
 class Game:
-    def __init__(self, role=Role.OFFENSIVE):
+    def __init__(self, role=Role.OFFENSIVE, board=None):
         while role is None:
             role_ = input("Which role do you prefer: OFFENSIVE or DEFENSIVE? \n")
             try:
                 role = Role[role_]
             except KeyError:
                 print("invalid choice, please input again. ")
+        if board is None:
+            if board := os.environ.get("BOARD"):
+                board = BOARDS[board]
+            else:
+                board = role.init
         self._recommender = TreeSearchRecommender()
         self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
         self._winner = None
-        self._state = State(role.init, next_side=Role.OFFENSIVE)
+        self._state = State(board, next_side=Role.OFFENSIVE)
 
     def play(self):
         print(f"Welcome to Chinese Chess! ")
@@ -45,7 +53,6 @@ class Game:
                 print(HELP)
                 continue
             if command.lower() == "resign":
-                self._winner = self._state.next_side.OPPONENT
                 return
             if command.lower() == "revert":
                 if len(self._history) >= 2:
@@ -70,5 +77,9 @@ class Game:
 
     def _machine_move(self):
         print("Machine is thinking...")
+        time_s = time.time()
         result = self._recommender.strategy(self._state)
+        time_e = time.time()
+        if DEVELOPER_MODE:
+            print(f"Time: {time_e-time_s}")
         return result

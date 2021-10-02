@@ -1,15 +1,15 @@
 import os
 from enum import Enum
 
-from .boards import OFFENSIVE_INIT, DEFENSIVE_INIT
+from .boards import BOARDS
 from .color import COLOR_WARM, COLOR_COOL
 from .coding import ENCODE, DECODE
 from .help import HELP
 
 
 class Role(Enum):
-    OFFENSIVE = OFFENSIVE_INIT, str.islower
-    DEFENSIVE = DEFENSIVE_INIT, str.isupper
+    OFFENSIVE = BOARDS['OFFENSIVE'], str.islower
+    DEFENSIVE = BOARDS['DEFENSIVE'], str.isupper
 
     def __init__(self, init, func):
         self._init = init
