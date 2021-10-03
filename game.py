@@ -49,9 +49,6 @@ class Game:
     def _mankind_move(self):
         while True:
             command = input(f"please input your next move: ")
-            if command in ("--help", "-h"):
-                print(HELP)
-                continue
             if command.lower() == "resign":
                 return
             if command.lower() == "revert":
@@ -62,6 +59,9 @@ class Game:
                     print(self._state.display)
                 else:
                     print("Unable to revert. ")
+                continue
+            if command == 'help' or len(command) not in (4, 5):
+                print(HELP)
                 continue
             try:
                 vector = self._state.parse(command)
