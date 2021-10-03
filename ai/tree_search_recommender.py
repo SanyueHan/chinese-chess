@@ -42,7 +42,7 @@ class Node:
 
 
 class TreeSearchRecommender:
-    DEPTH = 3
+    DEPTH = 4
 
     def strategy(self, state):
         root = Node(state)
@@ -50,8 +50,6 @@ class TreeSearchRecommender:
         index, score, result = root.search()
         if DEVELOPER_MODE:
             print(f"The best score for {state.next_side} in a search of depth {self.DEPTH} is {score}")
-            print(f"The envisioned result is: ")
-            print(result.display)
         return root.get_child(index).state
 
     @staticmethod
