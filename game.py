@@ -1,7 +1,7 @@
 import os
 import time
 
-from constants import Role, TURN, HELP, DEVELOPER_MODE, BOARDS
+from constants import Role, HELP, DEVELOPER_MODE, BOARDS
 from core.state import State
 from ai.tree_search_recommender import TreeSearchRecommender
 
@@ -35,7 +35,7 @@ class Game:
         print(f"Welcome to Chinese Chess! ")
         print(self._state.display)
         while self._winner is None:
-            side = TURN[len(self._history) % 2]
+            side = self._state.next_side
             if self._recommender.top_score(self._state, 2) == 0:
                 self._winner = side.opponent
                 break

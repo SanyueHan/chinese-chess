@@ -38,12 +38,6 @@ Role.OFFENSIVE._opponent = Role.DEFENSIVE
 Role.DEFENSIVE._opponent = Role.OFFENSIVE
 
 
-TURN = {
-    0: Role.OFFENSIVE,
-    1: Role.DEFENSIVE
-}
-
-
 DISPLAY = {
     ' ': '\u3000'
 }
