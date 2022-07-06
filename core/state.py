@@ -82,7 +82,7 @@ class State:
         board = [list(line) for line in self]
         board[i_f][j_f] = board[i_s][j_s]
         board[i_s][j_s] = " "
-        return self.create_with_cache(tuple(''.join(line) for line in board), self._next_side.OPPONENT)
+        return self.create_with_cache(tuple(''.join(line) for line in board), self._next_side.opponent)
 
     @classmethod
     def create_with_cache(cls, board, next_side):
@@ -104,11 +104,11 @@ class State:
             for i in (0, 1, 2, 7, 8, 9):
                 for j in (3, 4, 5):
                     if self[i][j] in GENERAL:
-                        if side.func(self[i][j]):
+                        if side.iff_func(self[i][j]):
                             self._generals[side] = (i, j)
                             return i, j
                         else:
-                            self._generals[side.OPPONENT] = (i, j)
+                            self._generals[side.opponent] = (i, j)
             else:
                 self._generals[side] = None
         return self._generals[side]
@@ -118,7 +118,7 @@ class State:
             self._pieces[side] = {}
             for i in range(10):
                 for j in range(9):
-                    if side.func(self[i][j]):
+                    if side.iff_func(self[i][j]):
                         self._pieces[side][(i, j)] = self[i][j]
         return self._pieces[side]
 
@@ -131,7 +131,7 @@ class State:
         """
         movement = ''.join(ENCODE.get(c, c) for c in command)
         for c in movement:
-            if self.next_side.OPPONENT.func(c):
+            if self.next_side.opponent.iff_func(c):
                 raise ValueError(f"{DECODE[c]} doesn't belongs to you. ")
 
         # get start coordinate
@@ -252,7 +252,7 @@ class State:
             return pawn_targets
         if piece in GENERAL:
             general_targets = [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
-            i_, j_ = self.general_position(side.OPPONENT)
+            i_, j_ = self.general_position(side.opponent)
             if j == j_:
                 general_targets.append((i_, j_))
             return general_targets

@@ -6,6 +6,12 @@ from core.state import State
 from ai.tree_search_recommender import TreeSearchRecommender
 
 
+BOARD_MAP_FOR_HUMAN_ROLES = {
+    Role.OFFENSIVE: BOARDS["OFFENSIVE"],
+    Role.DEFENSIVE: BOARDS["DEFENSIVE"]
+}
+
+
 class Game:
     def __init__(self, role=Role.OFFENSIVE, board=None):
         while role is None:
@@ -18,7 +24,7 @@ class Game:
             if board := os.environ.get("BOARD"):
                 board = BOARDS[board]
             else:
-                board = role.init
+                board = BOARD_MAP_FOR_HUMAN_ROLES[role]
         self._recommender = TreeSearchRecommender()
         self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
@@ -31,7 +37,7 @@ class Game:
         while self._winner is None:
             side = TURN[len(self._history) % 2]
             if self._recommender.top_score(self._state, 2) == 0:
-                self._winner = side.OPPONENT
+                self._winner = side.opponent
                 break
             if move := self._play_modes[side]():
                 self._history.append(self._state.board)
@@ -39,7 +45,7 @@ class Game:
                 print(move.display)
             else:
                 print(f"{side} resigned. ")
-                self._winner = side.OPPONENT
+                self._winner = side.opponent
             if DEVELOPER_MODE:
                 print(f"cache hit: {self._state.HIT}")
                 print(f"cache miss: {self._state.MISS}")

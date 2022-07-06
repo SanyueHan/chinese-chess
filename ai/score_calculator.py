@@ -23,7 +23,7 @@ class ScoreCalculator:
 
     def _score(self, state):
         self_power = sum(self._score_table[p.lower()] for p in state.pieces(state.next_side).values())
-        oppo_power = sum(self._score_table[p.lower()] for p in state.pieces(state.next_side.OPPONENT).values())
+        oppo_power = sum(self._score_table[p.lower()] for p in state.pieces(state.next_side.opponent).values())
         alive_score = 1 if state.general_position(state.next_side) else 0
 
         return alive_score * self_power / oppo_power
