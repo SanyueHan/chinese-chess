@@ -1,7 +1,8 @@
 import os
 import time
 
-from constants import Role, HELP, DEVELOPER_MODE, BOARDS
+from config import DEVELOPER_MODE
+from constants import Role, HELP, BOARDS
 from core.state import State
 from ai.tree_search_recommender import TreeSearchRecommender
 

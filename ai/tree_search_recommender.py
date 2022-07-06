@@ -1,5 +1,5 @@
 from ai.score_calculator import ScoreCalculator
-from constants import DEVELOPER_MODE
+from config import DEVELOPER_MODE
 
 get_score = ScoreCalculator().score
 
