@@ -1,9 +1,9 @@
 from typing import Tuple, List
 
 from constants import Role, DISPLAY, ENCODE, DECODE, SIDE
-from rules.boundaries import BOUNDARY
-from rules.paths import PATH
-from rules.targets import TARGETS
+from core.rules.boundaries import BOUNDARY
+from core.rules.paths import PATH
+from core.rules.targets import TARGETS
 
 PAWN = set("pP")
 GENERAL = set("gG")
