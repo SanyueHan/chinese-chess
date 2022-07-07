@@ -3,7 +3,8 @@ import time
 
 from config import DEVELOPER_MODE
 from constants import Role, HELP, BOARDS
-from core.state import State
+from core.errors import RuleViolatedError
+from game.state_for_human import StateForHuman
 from ai.tree_search_recommender import TreeSearchRecommender
 
 
@@ -30,7 +31,7 @@ class Game:
         self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
         self._winner = None
-        self._state = State(board, next_side=Role.OFFENSIVE)
+        self._state = StateForHuman(board, next_side=Role.OFFENSIVE)
 
     def play(self):
         print(f"Welcome to Chinese Chess! ")
@@ -61,7 +62,7 @@ class Game:
             if command.lower() == "revert":
                 if len(self._history) >= 2:
                     self._history.pop()
-                    self._state = State.create_with_cache(self._history.pop(), self._state.next_side)
+                    self._state = StateForHuman.create_with_cache(self._history.pop(), self._state.next_side)
                     print("Reverted to two steps before. ")
                     print(self._state.display)
                 else:
@@ -71,13 +72,13 @@ class Game:
                 print(HELP)
                 continue
             try:
-                vector = self._state.parse(command)
+                vector = self._state.parse_command(command)
                 vector = self._state.is_valid(vector)
                 result = self._state.create_from_vector(vector)
                 if self._recommender.top_score(result, 1) == float('inf'):
                     raise ValueError(f"Invalid movement: General will be killed. ")
                 return result
-            except ValueError as err:
+            except RuleViolatedError as err:
                 print(err)
                 print("Enter --help or -h for help. ")
                 continue

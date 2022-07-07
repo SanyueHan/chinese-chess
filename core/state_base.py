@@ -1,25 +1,14 @@
 from typing import Tuple, List
 
-from constants import Role, DISPLAY, ENCODE, DECODE, SIDE
+from constants import Role, DISPLAY, SIDE
+from core.errors import *
 from core.rules.boundaries import BOUNDARY
 from core.rules.paths import PATH
+from core.rules.pieces import *
 from core.rules.targets import TARGETS
 
-PAWN = set("pP")
-GENERAL = set("gG")
-SLOW_PIECES = PAWN | GENERAL
-ROOK = set("rR")
-CANNON = set("cC")
-FAST_PIECES = ROOK | CANNON
-STRAIGHT_PIECES = SLOW_PIECES | FAST_PIECES
-KNIGHT = set("kK")
-MINISTER = set("mM")
-ASSISTANT = set("aA")
-DIAGONAL_PIECES = KNIGHT | MINISTER | ASSISTANT
-PIECES = STRAIGHT_PIECES | DIAGONAL_PIECES
 
-
-class State:
+class StateBase:
     CACHE = {}
     HIT = 0
     MISS = 0
@@ -122,103 +111,6 @@ class State:
                         self._pieces[side][(i, j)] = self[i][j]
         return self._pieces[side]
 
-    def parse(self, command):
-        """
-        Input command, return start coordinate and final coordinate for the movement.
-        Check whether the movement is allowed for that kind of piece only,
-        without considering the restriction because of the other pieces on the board.
-        Raise error if check failed.
-        """
-        movement = ''.join(ENCODE.get(c, c) for c in command)
-        for c in movement:
-            if self.next_side.opponent.iff_func(c):
-                raise ValueError(f"{DECODE[c]} doesn't belongs to you. ")
-
-        # get start coordinate
-        if (piece := movement[0]) in PIECES and (position := movement[1]) in "123456789":
-            p = int(position)
-            if (n := self.cols[-p].count(piece)) != 1:
-                if n == 0:
-                    raise ValueError(f"Invalid command: {''.join(DECODE[c] for c in movement)}, "
-                                     f"no {DECODE[piece]} in column {p}")
-                if n > 1:
-                    raise ValueError(f"Invalid command: {''.join(DECODE[c] for c in movement)}, "
-                                     f"multiple {DECODE[piece]} in column {p}")
-            i = self.cols[-p].index(piece)
-            j = 9 - p
-
-        elif (piece := movement[1]) in PIECES and (position := movement[0]) in "^$":
-            for j in range(9):
-                col = self.cols[j]
-                if col.count(piece) == 2:
-                    i = col.find(piece) if position == "^" else col.rfind(piece)
-                    break
-            else:
-                raise ValueError(f"Invalid command: {''.join(DECODE[c] for c in movement)}, "
-                                 f"no two {DECODE[piece]} at same column")
-        else:
-            raise ValueError(f"Invalid command: {''.join(DECODE[c] for c in movement)}")
-        start = (i, j)
-
-        # command target check
-        if movement[2] not in "+-=":
-            raise ValueError(f"Invalid command: {movement}, invalid direction. ")
-        d = movement[2]
-        if movement[3] not in "123456789":
-            raise ValueError(f"Invalid command: {movement}, invalid destination. ")
-        n = int(movement[3])
-
-        # get final coordinate
-        if piece in STRAIGHT_PIECES:
-            if d == "+":
-                if piece in SLOW_PIECES and n != 1:
-                    raise ValueError(f"{DECODE[piece]} can only move one unit. ")
-                i -= n
-            if d == "-":
-                if piece in PAWN:
-                    raise ValueError(f"{DECODE[piece]} can not move backward. ")
-                if piece in GENERAL and n != 1:
-                    raise ValueError(f"{DECODE[piece]} can only move one unit. ")
-                i += n
-            if d == "=":
-                j = 9 - n
-                horizontal_displacement = abs(j - start[1])
-                if j == start[1]:
-                    raise ValueError(f"Invalid movement: no displacement. ")
-                if piece in SLOW_PIECES and horizontal_displacement != 1:
-                    raise ValueError(f"{DECODE[piece]} can only move one unit. ")
-                if piece in PAWN and i > 4:
-                    raise ValueError(f"{DECODE[piece]} can not move horizontally before passing the river. ")
-        else:
-            j = 9 - n
-            horizontal_displacement = abs(j - start[1])
-            if d == "=":
-                raise ValueError(f"Invalid movement for {DECODE[piece]}. ")
-            if piece in ASSISTANT:
-                if horizontal_displacement != 1:
-                    raise ValueError("Invalid movement for assistant. ")
-                if d == "+":
-                    i -= 1
-                if d == "-":
-                    i += 1
-            if piece in MINISTER:
-                if horizontal_displacement != 2:
-                    raise ValueError("Invalid movement for minister. ")
-                if d == "+":
-                    i -= 2
-                if d == "-":
-                    i += 2
-            if piece in KNIGHT:
-                if horizontal_displacement not in (1, 2):
-                    raise ValueError("Invalid movement for knight. ")
-                if d == "+":
-                    i -= 1 if horizontal_displacement == 2 else 2
-                if d == "-":
-                    i += 1 if horizontal_displacement == 2 else 2
-        final = (i, j)
-
-        return start, final
-
     @property
     def valid_choices(self):
         if self._valid_choices is None:
@@ -229,7 +121,7 @@ class State:
             for v in vectors:
                 try:
                     self._valid_choices.append(self.create_from_vector(self.is_valid(v)))
-                except ValueError:
+                except RuleViolatedError:
                     pass
         return self._valid_choices
 
@@ -270,22 +162,22 @@ class State:
         i_f, j_f = final
         piece_s = self[i_s][j_s]
         if i_f < 0 or i_f > 9 or j_f < 0 or j_f > 8:
-            raise ValueError(f"Invalid movement, {DECODE[piece_s]} exceeds boundary. ")
+            raise ExceedBoundaryError
         if not BOUNDARY[piece_s.lower()](i_f, j_f):
-            raise ValueError(f"Invalid movement, {DECODE[piece_s]} exceeds boundary. ")
+            raise ExceedBoundaryError
         piece_f = self[i_f][j_f]
 
         if SIDE.get(piece_s, None) == SIDE.get(piece_f, None):
-            raise ValueError(f"Invalid movement, {DECODE[piece_s]} attacks friend. ")
+            raise AttackFriendError
 
         path = ''.join(self.occupation(point) for point in PATH[piece_s.lower()](vector))
         num_of_obstacle = len(path) - path.count(' ')
         if piece_s in CANNON and piece_f != ' ':
             # cannon is attacking, one obstacle should on the path
             if num_of_obstacle != 1:
-                raise ValueError(f"Invalid path for {DECODE[piece_s]}. ")
+                raise NoRackError
         else:
             # cannon is not attacking or other pieces is moving or attacking, no obstacle should on the path
             if num_of_obstacle != 0:
-                raise ValueError(f"Invalid path for {DECODE[piece_s]}. ")
+                raise PathBlockedError
         return vector
