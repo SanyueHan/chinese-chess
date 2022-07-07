@@ -3,7 +3,7 @@ from core.rules.pieces import *
 from core import StateBase
 
 
-class StateForHuman(StateBase):
+class StateForMankind(StateBase):
     def parse_command(self, command):
         """
         Input command, return start coordinate and final coordinate for the movement.

@@ -4,7 +4,7 @@ import time
 from config import DEVELOPER_MODE
 from constants import Role, HELP, BOARDS
 from core.errors import RuleViolatedError
-from game.state_for_human import StateForHuman
+from game.state_for_mankind import StateForMankind
 from ai.tree_search_recommender import TreeSearchRecommender
 
 
@@ -31,7 +31,7 @@ class Game:
         self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
         self._winner = None
-        self._state = StateForHuman(board, next_side=Role.OFFENSIVE)
+        self._state = StateForMankind(board, next_side=Role.OFFENSIVE)
 
     def play(self):
         print(f"Welcome to Chinese Chess! ")
@@ -62,7 +62,7 @@ class Game:
             if command.lower() == "revert":
                 if len(self._history) >= 2:
                     self._history.pop()
-                    self._state = StateForHuman.create_with_cache(self._history.pop(), self._state.next_side)
+                    self._state = StateForMankind.create_with_cache(self._history.pop(), self._state.next_side)
                     print("Reverted to two steps before. ")
                     print(self._state.display)
                 else:
@@ -86,7 +86,7 @@ class Game:
     def _machine_move(self):
         print("Machine is thinking...")
         time_s = time.time()
-        result = self._recommender.strategy(self._state)
+        result = self._recommender.strategy(self._state.board, self._state.next_side)
         time_e = time.time()
         if DEVELOPER_MODE:
             print(f"Time: {time_e-time_s}")
