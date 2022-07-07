@@ -1,17 +1,23 @@
 import os
 import time
 
+from ai.state_for_machine import StateForMachine
 from config import DEVELOPER_MODE
 from constants import Role, HELP, BOARDS
 from core.errors import RuleViolatedError
 from game.state_for_mankind import StateForMankind
-from ai.tree_search_recommender import TreeSearchRecommender
+from ai.tree_searcher import TreeSearcher
 
 
 BOARD_MAP_FOR_HUMAN_ROLES = {
     Role.OFFENSIVE: BOARDS["OFFENSIVE"],
     Role.DEFENSIVE: BOARDS["DEFENSIVE"]
 }
+
+
+FOOL_PROOFER = TreeSearcher(1)
+REFEREE = TreeSearcher(2)
+AI = TreeSearcher(4)
 
 
 class Game:
@@ -27,7 +33,6 @@ class Game:
                 board = BOARDS[board]
             else:
                 board = BOARD_MAP_FOR_HUMAN_ROLES[role]
-        self._recommender = TreeSearchRecommender()
         self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
         self._winner = None
@@ -38,7 +43,7 @@ class Game:
         print(self._state.display)
         while self._winner is None:
             side = self._state.next_side
-            if self._recommender.top_score(self._state, 2) == 0:
+            if REFEREE.top_score(self._state.board, self._state.next_side) == 0:
                 self._winner = side.opponent
                 break
             if move := self._play_modes[side]():
@@ -49,9 +54,9 @@ class Game:
                 print(f"{side} resigned. ")
                 self._winner = side.opponent
             if DEVELOPER_MODE:
-                print(f"cache hit: {self._state.HIT}")
-                print(f"cache miss: {self._state.MISS}")
-                print(f"cache size: {len(self._state.CACHE)}")
+                print(f"cache hit: {StateForMachine.HIT}")
+                print(f"cache miss: {StateForMachine.MISS}")
+                print(f"cache size: {len(StateForMachine.CACHE)}")
         print(f"Winner: {self._winner}")
 
     def _mankind_move(self):
@@ -62,7 +67,7 @@ class Game:
             if command.lower() == "revert":
                 if len(self._history) >= 2:
                     self._history.pop()
-                    self._state = StateForMankind.create_with_cache(self._history.pop(), self._state.next_side)
+                    self._state = StateForMankind(self._history.pop(), self._state.next_side)
                     print("Reverted to two steps before. ")
                     print(self._state.display)
                 else:
@@ -75,7 +80,7 @@ class Game:
                 vector = self._state.parse_command(command)
                 vector = self._state.is_valid(vector)
                 result = self._state.create_from_vector(vector)
-                if self._recommender.top_score(result, 1) == float('inf'):
+                if FOOL_PROOFER.top_score(result.board, result.next_side) == float('inf'):
                     raise ValueError(f"Invalid movement: General will be killed. ")
                 return result
             except RuleViolatedError as err:
@@ -86,7 +91,7 @@ class Game:
     def _machine_move(self):
         print("Machine is thinking...")
         time_s = time.time()
-        result = self._recommender.strategy(self._state.board, self._state.next_side)
+        result = AI.strategy(self._state.board, self._state.next_side)
         time_e = time.time()
         if DEVELOPER_MODE:
             print(f"Time: {time_e-time_s}")
