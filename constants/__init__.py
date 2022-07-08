@@ -1,7 +1,6 @@
 from enum import Enum
 
 from .boards import BOARDS
-from .coding import ENCODE, DECODE
 
 
 class Role(Enum):
