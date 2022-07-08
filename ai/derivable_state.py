@@ -1,6 +1,6 @@
 from typing import Tuple, List
 
-from constants import Role, SIDE
+from constants import Role, get_role
 from core import StateBase
 from core.rules.pieces import *
 from core.rules.targets import TARGETS
@@ -64,7 +64,7 @@ class DerivableState(StateBase):
         if fun := TARGETS.get(piece.lower()):
             return fun(pos)
         i, j = pos
-        side = SIDE[piece]
+        side = get_role(piece)
         if piece in PAWN:
             pawn_targets = []
             if self._get_general_position(side)[0] in (0, 1, 2):

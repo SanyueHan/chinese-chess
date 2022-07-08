@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from constants import Role, DISPLAY, SIDE
+from constants import Role, DISPLAY, get_role
 from core.errors import *
 from core.rules.boundaries import BOUNDARY
 from core.rules.paths import PATH
@@ -84,7 +84,7 @@ class StateBase:
             raise ExceedBoundaryError
         piece_f = self[i_f][j_f]
 
-        if SIDE.get(piece_s, None) == SIDE.get(piece_f, None):
+        if get_role(piece_s) == get_role(piece_f):
             raise AttackFriendError
 
         path = ''.join(self.occupation(point) for point in PATH[piece_s.lower()](vector))

@@ -36,6 +36,13 @@ Role.OFFENSIVE._opponent = Role.DEFENSIVE
 Role.DEFENSIVE._opponent = Role.OFFENSIVE
 
 
+def get_role(p):
+    for role in Role:
+        if role.iff_func(p):
+            return role
+    return None
+
+
 DISPLAY = {
     ' ': '\u3000'
 }
@@ -46,14 +53,6 @@ for k, v in DECODE.items():
         DISPLAY[k] = COLOR_WARM(v)
     else:
         DISPLAY[k] = COLOR_COOL(v)
-
-
-SIDE = {}
-for k in DECODE:
-    if k.isalpha() and k.islower():
-        SIDE[k] = Role.OFFENSIVE
-    if k.isalpha() and k.isupper():
-        SIDE[k] = Role.DEFENSIVE
 
 
 if __name__ == "__main__":
