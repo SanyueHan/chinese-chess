@@ -2,9 +2,10 @@ import os
 import time
 
 from config import DEVELOPER_MODE
-from constants import Role, HELP, BOARDS
+from constants import Role, BOARDS
 from core.errors import RuleViolatedError
 from game.errors import LosingGameError
+from game.help import HELP
 from game.state_for_mankind import StateForMankind
 from ai.tree_searcher import TreeSearcher
 
