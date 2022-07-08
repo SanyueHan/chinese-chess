@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from constants import Role, DISPLAY, get_role
+from constants import Role, get_role
 from core.errors import *
 from core.rules.boundaries import BOUNDARY
 from core.rules.paths import PATH
@@ -39,12 +39,6 @@ class StateBase:
         if not self._cols:
             self._cols = [''.join(row[j] for row in self.rows) for j in range(9)]
         return self._cols
-
-    @property
-    def display(self):
-        shift = " " * 50
-        lines = ["一二三四五六七八九", *[''.join(DISPLAY[c] for c in row) for row in self.rows], "九八七六五四三二一"]
-        return f'\n'.join(shift + line for line in lines)
 
     def create_from_vector(self, vector):
         start, final = vector

@@ -1,6 +1,8 @@
 from enum import Enum
 from functools import partial
 
+from constants import DECODE
+
 
 class Fore(Enum):
     BLACK = 30
@@ -34,3 +36,15 @@ def add_color(char, mode, fore, back):
 
 COLOR_WARM = partial(add_color, mode=Mode.DEFAULT, fore=Fore.BLACK, back=Back.WHITE)
 COLOR_COOL = partial(add_color, mode=Mode.DEFAULT, fore=Fore.WHITE, back=Back.BLACK)
+
+
+DISPLAY = {
+    ' ': '\u3000'
+}
+
+
+for k, v in DECODE.items():
+    if k.islower():
+        DISPLAY[k] = COLOR_WARM(v)
+    else:
+        DISPLAY[k] = COLOR_COOL(v)

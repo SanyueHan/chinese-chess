@@ -1,7 +1,6 @@
 from enum import Enum
 
 from .boards import BOARDS
-from .color import COLOR_WARM, COLOR_COOL
 from .coding import ENCODE, DECODE
 
 
@@ -41,18 +40,6 @@ def get_role(p):
         if role.iff_func(p):
             return role
     return None
-
-
-DISPLAY = {
-    ' ': '\u3000'
-}
-
-
-for k, v in DECODE.items():
-    if k.islower():
-        DISPLAY[k] = COLOR_WARM(v)
-    else:
-        DISPLAY[k] = COLOR_COOL(v)
 
 
 if __name__ == "__main__":
