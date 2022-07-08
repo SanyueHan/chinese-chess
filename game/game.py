@@ -1,7 +1,6 @@
 import os
 import time
 
-from ai.state_for_machine import StateForMachine
 from config import DEVELOPER_MODE
 from constants import Role, HELP, BOARDS
 from core.errors import RuleViolatedError
@@ -44,7 +43,7 @@ class Game:
         print(self._state.display)
         while self._winner is None:
             side = self._state.next_side
-            if REFEREE.top_score(self._state.board, self._state.next_side) == 0:
+            if REFEREE.get_top_score(self._state.board, self._state.next_side) == 0:
                 self._winner = side.opponent
                 break
             if move := self._play_modes[side]():
@@ -54,10 +53,6 @@ class Game:
             else:
                 print(f"{side} resigned. ")
                 self._winner = side.opponent
-            if DEVELOPER_MODE:
-                print(f"cache hit: {StateForMachine.HIT}")
-                print(f"cache miss: {StateForMachine.MISS}")
-                print(f"cache size: {len(StateForMachine.CACHE)}")
         print(f"Winner: {self._winner}")
 
     def _mankind_move(self):
@@ -79,9 +74,9 @@ class Game:
                 continue
             try:
                 vector = self._state.parse_command(command)
-                vector = self._state.is_valid(vector)
+                vector = self._state.check_validity(vector)
                 result = self._state.create_from_vector(vector)
-                if FOOL_PROOFER.top_score(result.board, result.next_side) == float('inf'):
+                if FOOL_PROOFER.get_top_score(result.board, result.next_side) == float('inf'):
                     raise LosingGameError
                 return result
             except (RuleViolatedError, LosingGameError) as err:
@@ -92,7 +87,10 @@ class Game:
     def _machine_move(self):
         print("Machine is thinking...")
         time_s = time.time()
-        result = AI.strategy(self._state.board, self._state.next_side)
+        result = StateForMankind(
+            AI.get_best_recommendation(self._state.board, self._state.next_side),
+            next_side=self._state.next_side.opponent
+        )
         time_e = time.time()
         if DEVELOPER_MODE:
             print(f"Time: {time_e-time_s}")

@@ -59,12 +59,20 @@ class StateBase:
         i, j = tup
         return self[i][j]
 
-    def is_valid(self, vector):
+    def is_valid(self, vector) -> bool:
+        try:
+            self.check_validity(vector)
+            return True
+        except RuleViolatedError:
+            return False
+
+    def check_validity(self, vector) -> Tuple:
         """
         check whether the displacement is performable by ensuring that:
         1. the target is valid (not occupied by own pieces and not exceed bound)
         2. the path is valid (no obstacle for common pieces and one obstacle for cannon)
-        If requirement is satisfied, produce the new board in tuple of string format
+        If any rule is violated, raise an error,
+        otherwise, return the same vector
         """
         start, final = vector
         i_s, j_s = start
