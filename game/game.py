@@ -5,6 +5,7 @@ from ai.state_for_machine import StateForMachine
 from config import DEVELOPER_MODE
 from constants import Role, HELP, BOARDS
 from core.errors import RuleViolatedError
+from game.errors import LosingGameError
 from game.state_for_mankind import StateForMankind
 from ai.tree_searcher import TreeSearcher
 
@@ -81,9 +82,9 @@ class Game:
                 vector = self._state.is_valid(vector)
                 result = self._state.create_from_vector(vector)
                 if FOOL_PROOFER.top_score(result.board, result.next_side) == float('inf'):
-                    raise ValueError(f"Invalid movement: General will be killed. ")
+                    raise LosingGameError
                 return result
-            except RuleViolatedError as err:
+            except (RuleViolatedError, LosingGameError) as err:
                 print(err)
                 print("Enter --help or -h for help. ")
                 continue

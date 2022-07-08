@@ -1,0 +1,4 @@
+
+
+class LosingGameError(Exception):
+    pass
