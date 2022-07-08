@@ -11,9 +11,9 @@ class TreeSearcher:
     def get_best_recommendation(self, board, next_side) -> Tuple[str]:
         root = CachedState(board, next_side)
         self._build(root, self._depth)
-        index, score, result = self._search(root, self._depth)
+        index, best_result = self._search(root, self._depth)
         if DEVELOPER_MODE:
-            print(f"The best score for {next_side} in a search of depth {self._depth} is {score}")
+            print(f"The best score for {next_side} in a search of depth {self._depth} is {best_result.score}")
             print(f"cache hit: {CachedState.HIT}")
             print(f"cache miss: {CachedState.MISS}")
             print(f"cache size: {len(CachedState.CACHE)}")
@@ -22,7 +22,11 @@ class TreeSearcher:
     def get_top_score(self, board, next_side):
         root = CachedState(board, next_side)
         self._build(root, self._depth)
-        return self._search(root, self._depth)[1]
+        _, best_result = self._search(root, self._depth)
+        if self._depth % 2:
+            return self.__get_reciprocal_value(best_result.score)
+        else:
+            return best_result.score
 
     def _build(self, state, depth):
         if depth:
@@ -30,13 +34,22 @@ class TreeSearcher:
                 self._build(child, depth-1)
 
     def _search(self, state, depth):
+        """
+        :param state:
+        :param depth:
+        :return: from which branch the best state comes, the best state
+        """
         if depth == 0 or not state.children:
-            return None, None, state
-        choices = [self._search(child, depth-1)[2] for child in state.children]
-        choices = [(choice.score, choice) for choice in choices]
-        choices = [(v, s) if s.next_side == state.next_side else (self.__get_reciprocal_value(v), s) for v, s in choices]
-        best = max(choices, key=lambda tup: tup[0])
-        return choices.index(best), best[0], best[1]
+            return None, state
+        results = [self._search(child, depth-1)[1] for child in state.children]
+        result_scores = {}
+        for res in results:
+            if res.next_side is state.next_side:
+                result_scores[res] = res.score
+            else:
+                result_scores[res] = self.__get_reciprocal_value(res.score)
+        best_result = max(result_scores, key=result_scores.get)
+        return list(result_scores.keys()).index(best_result), best_result
 
     @staticmethod
     def __get_reciprocal_value(score):
