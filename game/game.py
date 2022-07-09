@@ -4,7 +4,7 @@ from config import DEVELOPER_MODE, AI_SEARCH_DEPTH
 from core.consts.boards import DEFENSIVE_DOWN, OFFENSIVE_DOWN
 from core.errors import RuleViolatedError
 from core.role import Role
-from game.help import HELP
+from game.errors import InvalidCommandError
 from game.state_for_mankind import StateForMankind
 from engine import TreeSearcher
 
@@ -61,15 +61,16 @@ class Game:
                 else:
                     print("Unable to revert. ")
                 continue
-            if command == 'help' or len(command) not in (4, 5):
-                print(HELP)
-                continue
             try:
                 vector = self._state.parse_command(command)
-                vector = self._state.check_validity(vector)
+            except InvalidCommandError as err:
+                print(err)
+                print("See README.md for command format. ")
+                continue
+            try:
+                self._state.check_validity(vector)
             except RuleViolatedError as err:
                 print(err)
-                print("Enter --help or -h for help. ")
                 continue
             result = self._state.create_from_vector(vector)
             if FOOL_PROOFER.get_top_score(result.board, result.current_player)[0] == 1:
