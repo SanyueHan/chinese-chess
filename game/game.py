@@ -7,7 +7,7 @@ from core.role import Role
 from game.errors import LosingGameError
 from game.help import HELP
 from game.state_for_mankind import StateForMankind
-from ai.tree_searcher import TreeSearcher
+from engine import TreeSearcher
 
 
 FOOL_PROOFER = TreeSearcher(1)
