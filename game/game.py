@@ -1,6 +1,6 @@
 import time
 
-from config import DEVELOPER_MODE
+from config import DEVELOPER_MODE, AI_SEARCH_DEPTH
 from core.consts.boards import DEFENSIVE_DOWN, OFFENSIVE_DOWN
 from core.errors import RuleViolatedError
 from core.role import Role
@@ -12,7 +12,7 @@ from ai.tree_searcher import TreeSearcher
 
 FOOL_PROOFER = TreeSearcher(1)
 REFEREE = TreeSearcher(2)
-AI = TreeSearcher(4)
+AI = TreeSearcher(AI_SEARCH_DEPTH)
 
 
 class Game:
