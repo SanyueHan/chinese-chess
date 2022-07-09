@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import List, Union
 
 from core import StateBase
 from core.role import Role, get_role
@@ -15,8 +15,8 @@ class DerivableState(StateBase):
     (in game logic level this kind of movement is forbidden by a one-step-derivation, but here it's not considered)
     """
 
-    def __init__(self, board: Tuple[str], next_side: Role):
-        super().__init__(board, next_side)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._children = None
         self._generals = {}
         self._pieces = {}
@@ -33,10 +33,10 @@ class DerivableState(StateBase):
                     self._children.append(self.create_from_vector(v))
         return self._children
 
-    def get_child(self, index) -> 'DerivableState':
+    def get_child(self, index: int) -> 'DerivableState':
         return self._children[index]
 
-    def _get_general_position(self, side: Role):
+    def _get_general_position(self, side: Role) -> Union[tuple, None]:
         if side not in self._generals:
             for i in (0, 1, 2, 7, 8, 9):
                 for j in (3, 4, 5):
@@ -50,7 +50,7 @@ class DerivableState(StateBase):
                 self._generals[side] = None
         return self._generals[side]
 
-    def _get_pieces(self, side: Role):
+    def _get_pieces(self, side: Role) -> dict:
         if side not in self._pieces:
             self._pieces[side] = {}
             for i in range(10):
@@ -59,7 +59,7 @@ class DerivableState(StateBase):
                         self._pieces[side][(i, j)] = self[i][j]
         return self._pieces[side]
 
-    def _targets(self, pos) -> List[Tuple]:
+    def _targets(self, pos) -> List[tuple]:
         piece = self.occupation(pos)
         if fun := TARGETS.get(piece.lower()):
             return fun(pos)

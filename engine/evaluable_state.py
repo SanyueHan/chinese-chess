@@ -17,12 +17,12 @@ class EvaluableState(DerivableState):
         'g': 1  # use a small value to ensure that the total result is positive
     }  # 62 in total
 
-    def __init__(self, board, next_side):
-        super().__init__(board, next_side)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._score = None
 
     @property
-    def score(self):
+    def score(self) -> float:
         if self._score is None:
             self_power = sum(self.SCORE_TABLE[p.lower()] for p in self._get_pieces(self.current_player).values())
             oppo_power = sum(self.SCORE_TABLE[p.lower()] for p in self._get_pieces(self.current_player.opponent).values())

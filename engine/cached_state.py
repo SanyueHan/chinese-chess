@@ -1,3 +1,6 @@
+from typing import Tuple
+
+from core.role import Role
 from engine.evaluable_state import EvaluableState
 
 
@@ -10,17 +13,14 @@ class CachedState(EvaluableState):
     HIT = 0
     MISS = 0
 
-    @property
-    def feature(self):
-        return f"{self._board}{self._current_player}"
-
     @classmethod
-    def from_board_and_role(cls, board, role):
-        new = cls(board, role)
-        if new.feature in cls.CACHE:
+    def from_board_and_role(cls, board: Tuple[str], role: Role) -> 'CachedState':
+        feature = (board, role)
+        if feature in cls.CACHE:
             cls.HIT += 1
-            return cls.CACHE[new.feature]
+            return cls.CACHE[feature]
         else:
             cls.MISS += 1
-            cls.CACHE[new.feature] = new
-            return new
+            new_state = cls(board=board, current_player=role)
+            cls.CACHE[feature] = new_state
+            return new_state

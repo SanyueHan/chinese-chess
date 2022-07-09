@@ -6,12 +6,12 @@ from game.display import DISPLAY
 
 class StateForMankind(StateBase):
     @property
-    def display(self):
+    def display(self) -> str:
         shift = " " * 50
         lines = ["一二三四五六七八九", *[''.join(DISPLAY[c] for c in row) for row in self.rows], "九八七六五四三二一"]
         return f'\n'.join(shift + line for line in lines)
 
-    def parse_command(self, command):
+    def parse_command(self, command: str) -> tuple:
         """
         Input command, return start coordinate and final coordinate for the movement.
         Check whether the movement is allowed for that kind of piece only,

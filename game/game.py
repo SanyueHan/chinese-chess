@@ -27,7 +27,7 @@ class Game:
         self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
         self._winner = None
-        self._state = StateForMankind(board, next_side=Role.OFFENSIVE)
+        self._state = StateForMankind(board, current_player=Role.OFFENSIVE)
 
     def play(self):
         print(f"Welcome to Chinese Chess! ")
@@ -79,8 +79,8 @@ class Game:
         print("Machine is thinking...")
         time_s = time.time()
         result = StateForMankind(
-            AI.get_best_recommendation(self._state.board, self._state.current_player),
-            next_side=self._state.current_player.opponent
+            board=AI.get_best_recommendation(self._state.board, self._state.current_player),
+            current_player=self._state.current_player.opponent
         )
         time_e = time.time()
         if DEVELOPER_MODE:

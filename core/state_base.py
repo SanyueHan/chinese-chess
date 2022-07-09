@@ -8,9 +8,9 @@ from core.rules.pieces import CANNON
 
 
 class StateBase:
-    def __init__(self, board: Tuple[str], next_side: Role):
-        self._current_player = next_side
-        self._board = board
+    def __init__(self, board: Tuple[str], current_player: Role):
+        self._current_player: Role = current_player
+        self._board: Tuple[str] = board
         self._rows = None
         self._cols = None
 
@@ -21,37 +21,40 @@ class StateBase:
         return self._board[item]
 
     @property
-    def current_player(self):
+    def current_player(self) -> Role:
         return self._current_player
 
     @property
-    def board(self):
+    def board(self) -> Tuple[str]:
         return self._board
 
     @property
-    def rows(self):
+    def rows(self) -> Tuple[str]:
         if not self._rows:
-            self._rows = [row for row in self._board]
+            self._rows = tuple(row for row in self._board)
         return self._rows
 
     @property
-    def cols(self):
+    def cols(self) -> Tuple[str]:
         if not self._cols:
-            self._cols = [''.join(row[j] for row in self.rows) for j in range(9)]
+            self._cols = tuple(''.join(row[j] for row in self.rows) for j in range(9))
         return self._cols
 
     @classmethod
-    def from_board_and_role(cls, board, role):
-        return cls(board, role)
+    def from_board_and_role(cls, board: Tuple[str], role: Role) -> 'StateBase':
+        return cls(board=board, current_player=role)
 
-    def create_from_vector(self, vector):
+    def create_from_vector(self, vector) -> 'StateBase':
         start, final = vector
         i_s, j_s = start
         i_f, j_f = final
         board = [list(line) for line in self]
         board[i_f][j_f] = board[i_s][j_s]
         board[i_s][j_s] = " "
-        return self.from_board_and_role(tuple(''.join(line) for line in board), self._current_player.opponent)
+        return self.from_board_and_role(
+            board=tuple(''.join(line) for line in board),
+            role=self._current_player.opponent
+        )
 
     def occupation(self, tup):
         i, j = tup
@@ -64,7 +67,7 @@ class StateBase:
         except RuleViolatedError:
             return False
 
-    def check_validity(self, vector) -> Tuple:
+    def check_validity(self, vector) -> Tuple[tuple]:
         """
         check whether the displacement is performable by ensuring that:
         1. the target is valid (not occupied by own pieces and not exceed bound)
