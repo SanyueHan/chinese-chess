@@ -40,6 +40,10 @@ class StateBase:
             self._cols = [''.join(row[j] for row in self.rows) for j in range(9)]
         return self._cols
 
+    @classmethod
+    def from_board_and_role(cls, board, role):
+        return cls(board, role)
+
     def create_from_vector(self, vector):
         start, final = vector
         i_s, j_s = start
@@ -47,7 +51,7 @@ class StateBase:
         board = [list(line) for line in self]
         board[i_f][j_f] = board[i_s][j_s]
         board[i_s][j_s] = " "
-        return self.__class__(tuple(''.join(line) for line in board), self._current_player.opponent)
+        return self.from_board_and_role(tuple(''.join(line) for line in board), self._current_player.opponent)
 
     def occupation(self, tup):
         i, j = tup
