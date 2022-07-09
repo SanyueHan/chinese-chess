@@ -1,7 +1,7 @@
 from typing import Tuple, List
 
-from constants import Role, get_role
 from core import StateBase
+from core.role import Role, get_role
 from core.rules.pieces import *
 from core.rules.targets import TARGETS
 

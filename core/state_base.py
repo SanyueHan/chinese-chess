@@ -1,7 +1,7 @@
 from typing import Tuple
 
-from constants import Role, get_role
 from core.errors import *
+from core.role import Role, get_role
 from core.rules.boundaries import BOUNDARY
 from core.rules.paths import PATH
 from core.rules.pieces import CANNON

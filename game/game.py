@@ -2,8 +2,9 @@ import os
 import time
 
 from config import DEVELOPER_MODE
-from constants import Role, BOARDS
+from constants import BOARDS
 from core.errors import RuleViolatedError
+from core.role import Role
 from game.errors import LosingGameError
 from game.help import HELP
 from game.state_for_mankind import StateForMankind
