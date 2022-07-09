@@ -1,3 +1,4 @@
+import sys
 from typing import Tuple, Union
 
 from config import DEVELOPER_MODE
@@ -18,7 +19,8 @@ class TreeSearcher:
             print(f"The best score for {current_player} in a search of depth {self._depth} is {best_result.score}")
             print(f"cache hit: {CachedState.HIT}")
             print(f"cache miss: {CachedState.MISS}")
-            print(f"cache size: {len(CachedState.CACHE)}")
+            print(f"cache size (KB): {CachedState.CACHE.__sizeof__() // 1000}")
+            print(f"cache size (KB): {sys.getsizeof(CachedState.CACHE) // 1000}")
         return root.get_child(index).board
 
     def get_top_score(self, board: Tuple[str], current_player: Role) -> float:
