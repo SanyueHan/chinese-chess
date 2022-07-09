@@ -44,7 +44,7 @@ class TreeSearcher:
         results = [self._search(child, depth-1)[1] for child in state.children]
         result_scores = {}
         for res in results:
-            if res.next_side is state.next_side:
+            if res.current_player is state.current_player:
                 result_scores[res] = res.score
             else:
                 result_scores[res] = self.__get_reciprocal_value(res.score)

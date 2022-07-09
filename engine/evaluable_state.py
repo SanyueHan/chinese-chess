@@ -24,8 +24,8 @@ class EvaluableState(DerivableState):
     @property
     def score(self):
         if self._score is None:
-            self_power = sum(self.SCORE_TABLE[p.lower()] for p in self._get_pieces(self.next_side).values())
-            oppo_power = sum(self.SCORE_TABLE[p.lower()] for p in self._get_pieces(self.next_side.opponent).values())
-            alive_score = 1 if self._get_general_position(self.next_side) else 0
+            self_power = sum(self.SCORE_TABLE[p.lower()] for p in self._get_pieces(self.current_player).values())
+            oppo_power = sum(self.SCORE_TABLE[p.lower()] for p in self._get_pieces(self.current_player.opponent).values())
+            alive_score = 1 if self._get_general_position(self.current_player) else 0
             self._score = alive_score * self_power / oppo_power
         return self._score

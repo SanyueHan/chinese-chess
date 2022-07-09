@@ -20,7 +20,7 @@ class StateForMankind(StateBase):
         """
         movement = ''.join(ENCODE.get(c, c) for c in command)
         for c in movement:
-            if self.next_side.opponent.iff_func(c):
+            if self.current_player.opponent.iff_func(c):
                 raise ValueError(f"{DECODE[c]} doesn't belongs to you. ")
 
         # get start coordinate

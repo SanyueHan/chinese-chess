@@ -9,7 +9,7 @@ from core.rules.pieces import CANNON
 
 class StateBase:
     def __init__(self, board: Tuple[str], next_side: Role):
-        self._next_side = next_side
+        self._current_player = next_side
         self._board = board
         self._rows = None
         self._cols = None
@@ -21,8 +21,8 @@ class StateBase:
         return self._board[item]
 
     @property
-    def next_side(self):
-        return self._next_side
+    def current_player(self):
+        return self._current_player
 
     @property
     def board(self):
@@ -47,7 +47,7 @@ class StateBase:
         board = [list(line) for line in self]
         board[i_f][j_f] = board[i_s][j_s]
         board[i_s][j_s] = " "
-        return self.__class__(tuple(''.join(line) for line in board), self._next_side.opponent)
+        return self.__class__(tuple(''.join(line) for line in board), self._current_player.opponent)
 
     def occupation(self, tup):
         i, j = tup

@@ -25,9 +25,9 @@ class DerivableState(StateBase):
     def children(self) -> List['DerivableState']:
         if self._children is None:
             self._children = []
-            if self._get_general_position(self._next_side) is None:
+            if self._get_general_position(self._current_player) is None:
                 return self._children
-            vectors = sum(([(k, t) for t in self._targets(k)] for k in self._get_pieces(self._next_side)), [])
+            vectors = sum(([(k, t) for t in self._targets(k)] for k in self._get_pieces(self._current_player)), [])
             for v in vectors:
                 if self.is_valid(v):
                     self._children.append(self.create_from_vector(v))

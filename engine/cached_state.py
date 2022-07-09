@@ -12,7 +12,7 @@ class CachedState(EvaluableState):
 
     @property
     def feature(self):
-        return f"{self._board}{self._next_side}"
+        return f"{self._board}{self._current_player}"
 
     @classmethod
     def create_with_cache(cls, board, next_side):
@@ -32,4 +32,4 @@ class CachedState(EvaluableState):
         board = [list(line) for line in self]
         board[i_f][j_f] = board[i_s][j_s]
         board[i_s][j_s] = " "
-        return self.create_with_cache(tuple(''.join(line) for line in board), self._next_side.opponent)
+        return self.create_with_cache(tuple(''.join(line) for line in board), self._current_player.opponent)

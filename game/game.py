@@ -33,8 +33,8 @@ class Game:
         print(f"Welcome to Chinese Chess! ")
         print(self._state.display)
         while self._winner is None:
-            side = self._state.next_side
-            if REFEREE.get_top_score(self._state.board, self._state.next_side) == 0:
+            side = self._state.current_player
+            if REFEREE.get_top_score(self._state.board, self._state.current_player) == 0:
                 self._winner = side.opponent
                 break
             if move := self._play_modes[side]():
@@ -54,7 +54,7 @@ class Game:
             if command.lower() == "revert":
                 if len(self._history) >= 2:
                     self._history.pop()
-                    self._state = StateForMankind(self._history.pop(), self._state.next_side)
+                    self._state = StateForMankind(self._history.pop(), self._state.current_player)
                     print("Reverted to two steps before. ")
                     print(self._state.display)
                 else:
@@ -67,7 +67,7 @@ class Game:
                 vector = self._state.parse_command(command)
                 vector = self._state.check_validity(vector)
                 result = self._state.create_from_vector(vector)
-                if FOOL_PROOFER.get_top_score(result.board, result.next_side) == float('inf'):
+                if FOOL_PROOFER.get_top_score(result.board, result.current_player) == float('inf'):
                     raise LosingGameError
                 return result
             except (RuleViolatedError, LosingGameError) as err:
@@ -79,8 +79,8 @@ class Game:
         print("Machine is thinking...")
         time_s = time.time()
         result = StateForMankind(
-            AI.get_best_recommendation(self._state.board, self._state.next_side),
-            next_side=self._state.next_side.opponent
+            AI.get_best_recommendation(self._state.board, self._state.current_player),
+            next_side=self._state.current_player.opponent
         )
         time_e = time.time()
         if DEVELOPER_MODE:
