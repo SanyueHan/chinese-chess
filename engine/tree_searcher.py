@@ -23,12 +23,12 @@ class TreeSearcher:
             print(f"cache size (KB): {sys.getsizeof(CachedState.CACHE) // 1000}")
         return root.get_child(index).board
 
-    def get_top_score(self, board: Tuple[str], current_player: Role) -> float:
+    def get_top_score(self, board: Tuple[str], current_player: Role) -> (int, int):
         root = CachedState(board=board, current_player=current_player)
         self._build(state=root, depth=self._depth)
         _, best_result = self._search(state=root, depth=self._depth)
         if self._depth % 2:
-            return self.__get_reciprocal_value(best_result.score)
+            return self.__get_opposite_vector(best_result.score)
         else:
             return best_result.score
 
@@ -51,12 +51,10 @@ class TreeSearcher:
             if res.current_player is state.current_player:
                 result_scores[res] = res.score
             else:
-                result_scores[res] = self.__get_reciprocal_value(res.score)
+                result_scores[res] = self.__get_opposite_vector(res.score)
         best_result = max(result_scores, key=result_scores.get)
         return list(result_scores.keys()).index(best_result), best_result
 
     @staticmethod
-    def __get_reciprocal_value(score):
-        if score:
-            return 1 / score
-        return float('inf')
+    def __get_opposite_vector(score):
+        return tuple(-s for s in score)

@@ -4,7 +4,6 @@ from config import DEVELOPER_MODE, AI_SEARCH_DEPTH
 from core.consts.boards import DEFENSIVE_DOWN, OFFENSIVE_DOWN
 from core.errors import RuleViolatedError
 from core.role import Role
-from game.errors import LosingGameError
 from game.help import HELP
 from game.state_for_mankind import StateForMankind
 from engine import TreeSearcher
@@ -34,7 +33,9 @@ class Game:
         print(self._state.display)
         while self._winner is None:
             side = self._state.current_player
-            if REFEREE.get_top_score(self._state.board, self._state.current_player) == 0:
+            if REFEREE.get_top_score(self._state.board, self._state.current_player)[0] == -1:
+                # if no matter how the current player move the opponent could always kill his/her/its general,
+                # the referee will judge the current player as the loser
                 self._winner = side.opponent
                 break
             if move := self._play_modes[side]():
@@ -66,14 +67,19 @@ class Game:
             try:
                 vector = self._state.parse_command(command)
                 vector = self._state.check_validity(vector)
-                result = self._state.create_from_vector(vector)
-                if FOOL_PROOFER.get_top_score(result.board, result.current_player) == float('inf'):
-                    raise LosingGameError
-                return result
-            except (RuleViolatedError, LosingGameError) as err:
+            except RuleViolatedError as err:
                 print(err)
                 print("Enter --help or -h for help. ")
                 continue
+            result = self._state.create_from_vector(vector)
+            if FOOL_PROOFER.get_top_score(result.board, result.current_player)[0] == 1:
+                # opponent could kill your general in one step if this movement is taken,
+                # indicating the player may enter a stupid command.
+                # forbid this action and ask the player to choose another one
+                # (The REFEREE didn't announce that you have lost the game, means better choice exists)
+                print("Invalid movement - general will be killed! ")
+            else:
+                return result
 
     def _machine_move(self):
         print("Machine is thinking...")
