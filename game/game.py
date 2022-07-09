@@ -1,8 +1,7 @@
-import os
 import time
 
 from config import DEVELOPER_MODE
-from constants import BOARDS
+from core.consts.boards import DEFENSIVE_DOWN, OFFENSIVE_DOWN
 from core.errors import RuleViolatedError
 from core.role import Role
 from game.errors import LosingGameError
@@ -11,30 +10,20 @@ from game.state_for_mankind import StateForMankind
 from ai.tree_searcher import TreeSearcher
 
 
-BOARD_MAP_FOR_HUMAN_ROLES = {
-    Role.OFFENSIVE: BOARDS["OFFENSIVE"],
-    Role.DEFENSIVE: BOARDS["DEFENSIVE"]
-}
-
-
 FOOL_PROOFER = TreeSearcher(1)
 REFEREE = TreeSearcher(2)
 AI = TreeSearcher(4)
 
 
 class Game:
-    def __init__(self, role=Role.OFFENSIVE, board=None):
+    def __init__(self, role=Role.OFFENSIVE):
         while role is None:
             role_ = input("Which role do you prefer: OFFENSIVE or DEFENSIVE? \n")
             try:
                 role = Role[role_]
             except KeyError:
                 print("invalid choice, please input again. ")
-        if board is None:
-            if board := os.environ.get("BOARD"):
-                board = BOARDS[board]
-            else:
-                board = BOARD_MAP_FOR_HUMAN_ROLES[role]
+        board = OFFENSIVE_DOWN if role is Role.OFFENSIVE else DEFENSIVE_DOWN
         self._play_modes = {Role.OFFENSIVE: self._machine_move, Role.DEFENSIVE: self._machine_move, role: self._mankind_move}
         self._history = []
         self._winner = None
