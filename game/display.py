@@ -38,7 +38,9 @@ COLOR_WARM = partial(add_color, mode=Mode.DEFAULT, fore=Fore.BLACK, back=Back.WH
 COLOR_COOL = partial(add_color, mode=Mode.DEFAULT, fore=Fore.WHITE, back=Back.BLACK)
 
 
-DISPLAY = {}
+DISPLAY = {
+    ' ': '\u3000'
+}
 
 
 for k, v in DECODE.items():
