@@ -38,13 +38,16 @@ COLOR_WARM = partial(add_color, mode=Mode.DEFAULT, fore=Fore.BLACK, back=Back.WH
 COLOR_COOL = partial(add_color, mode=Mode.DEFAULT, fore=Fore.WHITE, back=Back.BLACK)
 
 
-DISPLAY = {
-    ' ': '\u3000'
-}
+DISPLAY = {}
 
 
 for k, v in DECODE.items():
     if k.islower():
         DISPLAY[k] = COLOR_WARM(v)
-    else:
+    if k.isupper():
         DISPLAY[k] = COLOR_COOL(v)
+
+
+if __name__ == "__main__":
+    for k, v in DISPLAY.items():
+        print(k, v)
