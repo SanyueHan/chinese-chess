@@ -1,8 +1,7 @@
 import sys
-from typing import Tuple, Union
+from typing import Union
 
 from config import DEVELOPER_MODE
-from core.role import Role
 from engine.cached_state import CachedState
 
 
@@ -11,20 +10,20 @@ class TreeSearcher:
         assert depth > 0
         self._depth: int = depth
 
-    def get_best_recommendation(self, board: Tuple[str], current_player: Role) -> Tuple[str]:
-        root = CachedState(board=board, current_player=current_player)
+    def get_best_recommendation(self, serialized_state: str) -> str:
+        root = CachedState.from_string(serialized_state)
         self._build(state=root, depth=self._depth)
         index, best_result = self._search(state=root, depth=self._depth)
         if DEVELOPER_MODE:
-            print(f"The best score for {current_player} in a search of depth {self._depth} is {best_result.score}")
+            print(f"The best score for {root.current_player} in a search of depth {self._depth} is {best_result.score}")
             print(f"cache hit: {CachedState.HIT}")
             print(f"cache miss: {CachedState.MISS}")
             print(f"cache size (KB): {CachedState.CACHE.__sizeof__() // 1000}")
             print(f"cache size (KB): {sys.getsizeof(CachedState.CACHE) // 1000}")
-        return root.get_child(index).board
+        return root.get_child(index).to_string()
 
-    def get_top_score(self, board: Tuple[str], current_player: Role) -> (int, int):
-        root = CachedState(board=board, current_player=current_player)
+    def get_top_score(self, serialized_state: str) -> (int, int):
+        root = CachedState.from_string(serialized_state)
         self._build(state=root, depth=self._depth)
         _, best_result = self._search(state=root, depth=self._depth)
         if self._depth % 2:

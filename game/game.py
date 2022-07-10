@@ -33,7 +33,7 @@ class Game:
         print(self._state.display)
         while self._winner is None:
             side = self._state.current_player
-            if REFEREE.get_top_score(self._state.board, self._state.current_player)[0] == -1:
+            if REFEREE.get_top_score(self._state.to_string())[0] == -1:
                 # if no matter how the current player move the opponent could always kill his/her/its general,
                 # the referee will judge the current player as the loser
                 self._winner = side.opponent
@@ -73,7 +73,7 @@ class Game:
                 print(err)
                 continue
             result = self._state.from_vector(vector)
-            if FOOL_PROOFER.get_top_score(result.board, result.current_player)[0] == 1:
+            if FOOL_PROOFER.get_top_score(result.to_string())[0] == 1:
                 # opponent could kill your general in one step if this movement is taken,
                 # indicating the player may enter a stupid command.
                 # forbid this action and ask the player to choose another one
@@ -85,10 +85,7 @@ class Game:
     def _machine_move(self):
         print("Machine is thinking...")
         time_s = time.time()
-        result = StateForMankind(
-            board=AI.get_best_recommendation(self._state.board, self._state.current_player),
-            current_player=self._state.current_player.opponent
-        )
+        result = StateForMankind.from_string(AI.get_best_recommendation(self._state.to_string()))
         time_e = time.time()
         if DEVELOPER_MODE:
             print(f"Time: {time_e-time_s}")
