@@ -18,8 +18,8 @@ class DerivableState(StateBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._children = None
-        self._generals = {}
-        self._pieces = {}
+        self.__generals = {}
+        self.__pieces = {}
 
     @property
     def children(self) -> List['DerivableState']:
@@ -37,27 +37,27 @@ class DerivableState(StateBase):
         return self._children[index]
 
     def _get_general_position(self, side: Role) -> Union[tuple, None]:
-        if side not in self._generals:
+        if side not in self.__generals:
             for i in (0, 1, 2, 7, 8, 9):
                 for j in (3, 4, 5):
                     if self[i][j] in GENERAL:
                         if side.iff_func(self[i][j]):
-                            self._generals[side] = (i, j)
+                            self.__generals[side] = (i, j)
                             return i, j
                         else:
-                            self._generals[side.opponent] = (i, j)
+                            self.__generals[side.opponent] = (i, j)
             else:
-                self._generals[side] = None
-        return self._generals[side]
+                self.__generals[side] = None
+        return self.__generals[side]
 
     def _get_pieces(self, side: Role) -> dict:
-        if side not in self._pieces:
-            self._pieces[side] = {}
+        if side not in self.__pieces:
+            self.__pieces[side] = {}
             for i in range(10):
                 for j in range(9):
                     if side.iff_func(self[i][j]):
-                        self._pieces[side][(i, j)] = self[i][j]
-        return self._pieces[side]
+                        self.__pieces[side][(i, j)] = self[i][j]
+        return self.__pieces[side]
 
     def _targets(self, pos) -> List[tuple]:
         piece = self.occupation(pos)

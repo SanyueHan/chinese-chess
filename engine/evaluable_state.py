@@ -18,13 +18,13 @@ class EvaluableState(DerivableState):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._score = None
+        self.__score = None
 
     @property
     def score(self) -> (int, int):
-        if self._score is None:
-            self._score = (self._get_exist_score(), self._get_power_score())
-        return self._score
+        if self.__score is None:
+            self.__score = (self._get_exist_score(), self._get_power_score())
+        return self.__score
 
     def _get_exist_score(self) -> int:
         """
