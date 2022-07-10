@@ -11,7 +11,6 @@ class StateBase:
     def __init__(self, board: Tuple[str], current_player: Role):
         self._current_player: Role = current_player
         self._board: Tuple[str] = board
-        self.__rows = None
         self.__cols = None
 
     def __iter__(self):
@@ -30,9 +29,7 @@ class StateBase:
 
     @property
     def rows(self) -> Tuple[str]:
-        if not self.__rows:
-            self.__rows = tuple(row for row in self._board)
-        return self.__rows
+        return self._board
 
     @property
     def cols(self) -> Tuple[str]:
