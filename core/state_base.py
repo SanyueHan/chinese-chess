@@ -1,5 +1,6 @@
 from typing import Tuple
 
+from core.consts.coding import decode, encode
 from core.errors import *
 from core.role import Role, get_role
 from core.rules.boundaries import BOUNDARY
@@ -13,11 +14,17 @@ class StateBase:
         self._current_player: Role = current_player
         self.__cols = None
 
+    def __getitem__(self, item):
+        return self._board[item]
+
     def __iter__(self):
         return iter(self._board)
 
-    def __getitem__(self, item):
-        return self._board[item]
+    def __repr__(self):
+        return self.to_string()
+
+    def __str__(self):
+        return self.to_string()
 
     @property
     def board(self) -> Tuple[str]:
@@ -31,6 +38,18 @@ class StateBase:
     def from_board_and_role(cls, board: Tuple[str], role: Role) -> 'StateBase':
         return cls(board=board, current_player=role)
 
+    @classmethod
+    def from_string(cls, string: str) -> 'StateBase':
+        lines = string.split('\n')
+        current_player = Role[lines.pop()]
+        assert len(lines) == 10
+        assert all(len(line) == 9 for line in lines)
+        board = tuple(encode(line) for line in lines)
+        return cls(
+            board=board,
+            current_player=current_player
+        )
+
     def from_vector(self, vector) -> 'StateBase':
         start, final = vector
         i_s, j_s = start
@@ -42,6 +61,12 @@ class StateBase:
             board=tuple(''.join(line) for line in board),
             role=self._current_player.opponent
         )
+
+    def to_string(self, dec=True) -> str:
+        if dec:
+            return '\n'.join(decode(line) for line in self._board) + '\n' + self._current_player.name
+        else:
+            return '\n'.join(self._board) + '\n' + self._current_player.name
 
     def is_valid(self, vector) -> bool:
         try:
