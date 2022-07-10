@@ -1,7 +1,7 @@
 from enum import Enum
 from functools import partial
 
-from game.coding import DECODE
+from core.consts.coding import DECODE
 
 
 class Fore(Enum):

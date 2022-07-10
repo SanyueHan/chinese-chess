@@ -1,8 +1,3 @@
-"""
-The purpose of encoding chinese characters to letters is to simplify internal logic:
-"""
-
-
 ENCODE = {
     '进': '+',
     '退': '-',

@@ -1,4 +1,4 @@
-from game.coding import ENCODE, DECODE
+from core.consts.coding import ENCODE, DECODE
 from core.rules.pieces import *
 from core import StateBase
 from game.display import DISPLAY
