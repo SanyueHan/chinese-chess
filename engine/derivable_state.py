@@ -60,7 +60,7 @@ class DerivableState(StateBase):
         return self.__pieces[side]
 
     def _targets(self, pos) -> List[tuple]:
-        piece = self.occupation(pos)
+        piece = self._occupation(pos)
         if fun := TARGETS.get(piece.lower()):
             return fun(pos)
         i, j = pos

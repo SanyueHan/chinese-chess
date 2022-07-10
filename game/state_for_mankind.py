@@ -8,7 +8,7 @@ class StateForMankind(StateBase):
     @property
     def display(self) -> str:
         shift = " " * 50
-        lines = ["一二三四五六七八九", *[''.join(DISPLAY[c] for c in row) for row in self.rows], "九八七六五四三二一"]
+        lines = ["一二三四五六七八九", *[''.join(DISPLAY[c] for c in row) for row in self._rows], "九八七六五四三二一"]
         return f'\n'.join(shift + line for line in lines)
 
     def parse_command(self, command: str) -> tuple:
@@ -26,19 +26,19 @@ class StateForMankind(StateBase):
         # get start coordinate
         if (piece := movement[0]) in PIECES and (position := movement[1]) in "123456789":
             p = int(position)
-            if (n := self.cols[-p].count(piece)) != 1:
+            if (n := self._cols[-p].count(piece)) != 1:
                 if n == 0:
                     raise ValueError(f"Invalid command: {''.join(DECODE[c] for c in movement)}, "
                                      f"no {DECODE[piece]} in column {p}")
                 if n > 1:
                     raise ValueError(f"Invalid command: {''.join(DECODE[c] for c in movement)}, "
                                      f"multiple {DECODE[piece]} in column {p}")
-            i = self.cols[-p].index(piece)
+            i = self._cols[-p].index(piece)
             j = 9 - p
 
         elif (piece := movement[1]) in PIECES and (position := movement[0]) in "^$":
             for j in range(9):
-                col = self.cols[j]
+                col = self._cols[j]
                 if col.count(piece) == 2:
                     i = col.find(piece) if position == "^" else col.rfind(piece)
                     break

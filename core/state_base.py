@@ -9,8 +9,8 @@ from core.rules.pieces import CANNON
 
 class StateBase:
     def __init__(self, board: Tuple[str], current_player: Role):
-        self._current_player: Role = current_player
         self._board: Tuple[str] = board
+        self._current_player: Role = current_player
         self.__cols = None
 
     def __iter__(self):
@@ -20,22 +20,12 @@ class StateBase:
         return self._board[item]
 
     @property
-    def current_player(self) -> Role:
-        return self._current_player
-
-    @property
     def board(self) -> Tuple[str]:
         return self._board
 
     @property
-    def rows(self) -> Tuple[str]:
-        return self._board
-
-    @property
-    def cols(self) -> Tuple[str]:
-        if not self.__cols:
-            self.__cols = tuple(''.join(row[j] for row in self.rows) for j in range(9))
-        return self.__cols
+    def current_player(self) -> Role:
+        return self._current_player
 
     @classmethod
     def from_board_and_role(cls, board: Tuple[str], role: Role) -> 'StateBase':
@@ -52,10 +42,6 @@ class StateBase:
             board=tuple(''.join(line) for line in board),
             role=self._current_player.opponent
         )
-
-    def occupation(self, tup):
-        i, j = tup
-        return self[i][j]
 
     def is_valid(self, vector) -> bool:
         try:
@@ -85,7 +71,7 @@ class StateBase:
         if get_role(piece_s) == get_role(piece_f):
             raise AttackFriendError
 
-        path = ''.join(self.occupation(point) for point in PATH[piece_s.lower()](vector))
+        path = ''.join(self._occupation(point) for point in PATH[piece_s.lower()](vector))
         num_of_obstacle = len(path) - path.count(' ')
         if piece_s in CANNON and piece_f != ' ':
             # cannon is attacking, one obstacle should on the path
@@ -96,3 +82,17 @@ class StateBase:
             if num_of_obstacle != 0:
                 raise PathBlockedError
         return vector
+
+    @property
+    def _rows(self) -> Tuple[str]:
+        return self._board
+
+    @property
+    def _cols(self) -> Tuple[str]:
+        if not self.__cols:
+            self.__cols = tuple(''.join(row[j] for row in self._rows) for j in range(9))
+        return self.__cols
+
+    def _occupation(self, tup):
+        i, j = tup
+        return self[i][j]
