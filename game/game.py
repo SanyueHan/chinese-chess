@@ -72,7 +72,7 @@ class Game:
             except RuleViolatedError as err:
                 print(err)
                 continue
-            result = self._state.create_from_vector(vector)
+            result = self._state.from_vector(vector)
             if FOOL_PROOFER.get_top_score(result.board, result.current_player)[0] == 1:
                 # opponent could kill your general in one step if this movement is taken,
                 # indicating the player may enter a stupid command.

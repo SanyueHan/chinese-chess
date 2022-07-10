@@ -31,7 +31,7 @@ class StateBase:
     def from_board_and_role(cls, board: Tuple[str], role: Role) -> 'StateBase':
         return cls(board=board, current_player=role)
 
-    def create_from_vector(self, vector) -> 'StateBase':
+    def from_vector(self, vector) -> 'StateBase':
         start, final = vector
         i_s, j_s = start
         i_f, j_f = final

@@ -30,7 +30,7 @@ class DerivableState(StateBase):
             vectors = sum(([(k, t) for t in self._targets(k)] for k in self._get_pieces(self._current_player)), [])
             for v in vectors:
                 if self.is_valid(v):
-                    self._children.append(self.create_from_vector(v))
+                    self._children.append(self.from_vector(v))
         return self._children
 
     def get_child(self, index: int) -> 'DerivableState':
