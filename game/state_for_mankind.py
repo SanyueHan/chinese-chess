@@ -1,4 +1,4 @@
-from core.consts.coding import ENCODE, DECODE
+from core.consts.coding import DECODE, encode
 from core.rules.pieces import *
 from core import StateBase
 from game.display import DISPLAY
@@ -18,7 +18,7 @@ class StateForMankind(StateBase):
         without considering the restriction because of the other pieces on the board.
         Raise error if check failed.
         """
-        movement = ''.join(ENCODE.get(c, c) for c in command)
+        movement = encode(command)
         for c in movement:
             if self.current_player.opponent.iff_func(c):
                 raise ValueError(f"{DECODE[c]} doesn't belongs to you. ")
