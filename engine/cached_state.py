@@ -1,3 +1,4 @@
+import sys
 from typing import Tuple
 
 from core.role import Role
@@ -24,3 +25,10 @@ class CachedState(EvaluableState):
             new_state = cls(board=board, current_player=role)
             cls.CACHE[feature] = new_state
             return new_state
+
+    @classmethod
+    def debug_cache(cls):
+        print(f"cache hit: {cls.HIT}")
+        print(f"cache miss: {cls.MISS}")
+        print(f"cache size (KB): {cls.CACHE.__sizeof__() // 1000}")
+        print(f"cache size (KB): {sys.getsizeof(cls.CACHE) // 1000}")

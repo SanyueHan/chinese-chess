@@ -16,3 +16,17 @@ def time_debugger(func):
         return wrapper
     else:
         return func
+
+
+def generate_debugger(action):
+    def debugger(func):
+        if DEVELOPER_MODE:
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                res = func(*args, **kwargs)
+                action()
+                return res
+            return wrapper
+        else:
+            return func
+    return debugger
