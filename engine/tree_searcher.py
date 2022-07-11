@@ -3,6 +3,7 @@ from typing import Union
 
 from config import DEVELOPER_MODE
 from engine.cached_state import CachedState
+from utils.decorators import time_debugger
 
 
 class TreeSearcher:
@@ -10,12 +11,12 @@ class TreeSearcher:
         assert depth > 0
         self._depth: int = depth
 
+    @time_debugger
     def get_best_recommendation(self, serialized_state: str) -> str:
         root = CachedState.from_string(serialized_state)
         self._build(state=root, depth=self._depth)
         index, best_result = self._search(state=root, depth=self._depth)
         if DEVELOPER_MODE:
-            print(f"The best score for {root.current_player} in a search of depth {self._depth} is {best_result.score}")
             print(f"cache hit: {CachedState.HIT}")
             print(f"cache miss: {CachedState.MISS}")
             print(f"cache size (KB): {CachedState.CACHE.__sizeof__() // 1000}")

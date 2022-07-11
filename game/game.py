@@ -1,6 +1,4 @@
-import time
-
-from config import DEVELOPER_MODE, AI_SEARCH_DEPTH
+from config import AI_SEARCH_DEPTH
 from core.consts.boards import DEFENSIVE_DOWN, OFFENSIVE_DOWN
 from core.errors import RuleViolatedError
 from core.role import Role
@@ -84,9 +82,4 @@ class Game:
 
     def _machine_move(self):
         print("Machine is thinking...")
-        time_s = time.time()
-        result = StateForMankind.from_string(AI.get_best_recommendation(self._state.to_string()))
-        time_e = time.time()
-        if DEVELOPER_MODE:
-            print(f"Time: {time_e-time_s}")
-        return result
+        return StateForMankind.from_string(AI.get_best_recommendation(self._state.to_string()))
