@@ -35,10 +35,6 @@ class StateBase:
         return self._current_player
 
     @classmethod
-    def from_board_and_role(cls, board: Tuple[str], role: Role) -> 'StateBase':
-        return cls(board=board, current_player=role)
-
-    @classmethod
     def from_string(cls, string: str) -> 'StateBase':
         lines = string.split('\n')
         current_player = Role[lines.pop()]
@@ -57,9 +53,9 @@ class StateBase:
         board = [list(line) for line in self]
         board[i_f][j_f] = board[i_s][j_s]
         board[i_s][j_s] = " "
-        return self.from_board_and_role(
+        return self.__class__(
             board=tuple(''.join(line) for line in board),
-            role=self._current_player.opponent
+            current_player=self._current_player.opponent
         )
 
     def to_string(self, dec=True) -> str:
