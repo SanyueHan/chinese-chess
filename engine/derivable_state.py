@@ -1,12 +1,13 @@
 from typing import List, Union
 
+from TimeAnalyzer.metaclass import TimeAnalyzer
 from core import StateBase
 from core.role import Role, get_role
 from core.rules.pieces import *
 from core.rules.targets import TARGETS
 
 
-class DerivableState(StateBase):
+class DerivableState(StateBase, metaclass=TimeAnalyzer):
     """
     DerivableState provide an interface that returns all the valid children state in the current situation,
     which could be used to generate a search tree.

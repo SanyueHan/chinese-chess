@@ -1,5 +1,6 @@
 from typing import Tuple
 
+from TimeAnalyzer.metaclass import TimeAnalyzer
 from core.consts.coding import decode, encode
 from core.errors import *
 from core.role import Role, get_role
@@ -8,7 +9,7 @@ from core.rules.paths import PATH
 from core.rules.pieces import CANNON
 
 
-class StateBase:
+class StateBase(metaclass=TimeAnalyzer):
     def __init__(self, board: Tuple[str], current_player: Role):
         self._board: Tuple[str] = board
         self._current_player: Role = current_player

@@ -1,7 +1,8 @@
+from TimeAnalyzer.metaclass import TimeAnalyzer
 from engine.derivable_state import DerivableState
 
 
-class EvaluableState(DerivableState):
+class EvaluableState(DerivableState, metaclass=TimeAnalyzer):
     """
     EvaluableState provide a score to evaluate the situation
     used as heuristic function in heuristic search
