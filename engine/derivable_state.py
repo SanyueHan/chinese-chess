@@ -25,17 +25,20 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
     @property
     def children(self) -> List['DerivableState']:
         if self._children is None:
-            self._children = []
-            if self._get_general_position(self._current_player) is None:
-                return self._children
-            vectors = sum(([(k, t) for t in self._targets(k)] for k in self._get_pieces(self._current_player)), [])
-            for v in vectors:
-                if self.is_valid(v):
-                    self._children.append(self.from_vector(v))
+            self._get_children()
         return self._children
 
     def get_child(self, index: int) -> 'DerivableState':
         return self._children[index]
+
+    def _get_children(self):
+        self._children = []
+        if self._get_general_position(self._current_player):
+            for source in self._get_pieces(self._current_player):
+                for target in self._get_targets(source):
+                    vector = (source, target)
+                    if self.is_valid(vector):
+                        self._children.append(self.from_vector(vector))
 
     def _get_general_position(self, side: Role) -> Union[tuple, None]:
         if side not in self.__generals:
@@ -60,7 +63,7 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
                         self.__pieces[side][(i, j)] = self._board[i][j]
         return self.__pieces[side]
 
-    def _targets(self, pos) -> List[tuple]:
+    def _get_targets(self, pos) -> List[tuple]:
         piece = self._occupation(pos)
         if fun := TARGETS.get(piece.lower()):
             return fun(pos)
