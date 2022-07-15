@@ -15,12 +15,6 @@ class StateBase(metaclass=TimeAnalyzer):
         self._current_player: Role = current_player
         self.__cols = None
 
-    def __getitem__(self, item):
-        return self._board[item]
-
-    def __iter__(self):
-        return iter(self._board)
-
     def __repr__(self):
         return self.to_string()
 
@@ -51,7 +45,7 @@ class StateBase(metaclass=TimeAnalyzer):
         start, final = vector
         i_s, j_s = start
         i_f, j_f = final
-        board = [list(line) for line in self]
+        board = [list(line) for line in self._board]
         board[i_f][j_f] = board[i_s][j_s]
         board[i_s][j_s] = " "
         return self.__class__(
@@ -83,12 +77,12 @@ class StateBase(metaclass=TimeAnalyzer):
         start, final = vector
         i_s, j_s = start
         i_f, j_f = final
-        piece_s = self[i_s][j_s]
+        piece_s = self._board[i_s][j_s]
         if i_f < 0 or i_f > 9 or j_f < 0 or j_f > 8:
             raise ExceedBoundaryError
         if not BOUNDARY[piece_s.lower()](i_f, j_f):
             raise ExceedBoundaryError
-        piece_f = self[i_f][j_f]
+        piece_f = self._board[i_f][j_f]
 
         if get_role(piece_s) == get_role(piece_f):
             raise AttackFriendError
@@ -117,4 +111,4 @@ class StateBase(metaclass=TimeAnalyzer):
 
     def _occupation(self, tup):
         i, j = tup
-        return self[i][j]
+        return self._board[i][j]

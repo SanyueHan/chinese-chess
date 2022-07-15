@@ -41,8 +41,8 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
         if side not in self.__generals:
             for i in (0, 1, 2, 7, 8, 9):
                 for j in (3, 4, 5):
-                    if self[i][j] in GENERAL:
-                        if side.iff_func(self[i][j]):
+                    if self._board[i][j] in GENERAL:
+                        if side.iff_func(self._board[i][j]):
                             self.__generals[side] = (i, j)
                             return i, j
                         else:
@@ -56,8 +56,8 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
             self.__pieces[side] = {}
             for i in range(10):
                 for j in range(9):
-                    if side.iff_func(self[i][j]):
-                        self.__pieces[side][(i, j)] = self[i][j]
+                    if side.iff_func(self._board[i][j]):
+                        self.__pieces[side][(i, j)] = self._board[i][j]
         return self.__pieces[side]
 
     def _targets(self, pos) -> List[tuple]:
