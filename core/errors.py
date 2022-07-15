@@ -4,6 +4,12 @@ class RuleViolatedError(Exception):
     pass
 
 
+class ExceedBoardError(RuleViolatedError):
+    """
+    Raised if the target of a movement falls beyond the board
+    """
+
+
 class ExceedBoundaryError(RuleViolatedError):
     """
     Raised if the target of a movement falls beyond its boundary
@@ -16,7 +22,7 @@ class AttackFriendError(RuleViolatedError):
     """
 
 
-class NoRackError(RuleViolatedError):
+class NotOneRackError(RuleViolatedError):
     """
     Raised if no rack exists when cannon is attacking
     """

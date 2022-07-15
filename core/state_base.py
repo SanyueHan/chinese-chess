@@ -79,7 +79,7 @@ class StateBase(metaclass=TimeAnalyzer):
         i_f, j_f = final
         piece_s = self._board[i_s][j_s]
         if i_f < 0 or i_f > 9 or j_f < 0 or j_f > 8:
-            raise ExceedBoundaryError
+            raise ExceedBoardError
         if not BOUNDARY[piece_s.lower()](i_f, j_f):
             raise ExceedBoundaryError
         piece_f = self._board[i_f][j_f]
@@ -92,7 +92,7 @@ class StateBase(metaclass=TimeAnalyzer):
         if piece_s in CANNON and piece_f != ' ':
             # cannon is attacking, one obstacle should on the path
             if num_of_obstacle != 1:
-                raise NoRackError
+                raise NotOneRackError
         else:
             # cannon is not attacking or other pieces is moving or attacking, no obstacle should on the path
             if num_of_obstacle != 0:
