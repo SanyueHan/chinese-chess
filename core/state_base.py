@@ -41,7 +41,7 @@ class StateBase(metaclass=TimeAnalyzer):
             current_player=current_player
         )
 
-    def from_vector(self, vector) -> 'StateBase':
+    def from_vector(self, vector):
         start, final = vector
         i_s, j_s = start
         i_f, j_f = final

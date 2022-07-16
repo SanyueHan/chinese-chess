@@ -28,6 +28,15 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
             self._get_children()
         return self._children
 
+    def from_vector(self, vector) -> 'DerivableState':
+        new_state = super().from_vector(vector)
+        _, target = vector
+        for side, piece_dict in self.__pieces.items():
+            new_dict = piece_dict.copy()
+            new_dict.pop(target, None)
+            new_state.__pieces[side] = new_dict
+        return new_state
+
     def get_child(self, index: int) -> 'DerivableState':
         return self._children[index]
 
