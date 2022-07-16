@@ -30,11 +30,15 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
 
     def from_vector(self, vector) -> 'DerivableState':
         new_state = super().from_vector(vector)
-        _, target = vector
-        for side, piece_dict in self.__pieces.items():
-            new_dict = piece_dict.copy()
-            new_dict.pop(target, None)
-            new_state.__pieces[side] = new_dict
+        source, target = vector
+        if self_pieces := self.__pieces.get(self._current_player):
+            new_self_pieces = self_pieces.copy()
+            new_self_pieces[target] = new_self_pieces.pop(source)
+            new_state.__pieces[self._current_player] = new_self_pieces
+        if oppo_pieces := self.__pieces.get(self._current_player.opponent):
+            new_oppo_pieces = oppo_pieces.copy()
+            new_oppo_pieces.pop(target, None)
+            new_state.__pieces[self._current_player.opponent] = new_oppo_pieces
         return new_state
 
     def get_child(self, index: int) -> 'DerivableState':
