@@ -1,6 +1,6 @@
 def rook_cannon_targets(tup):
     i, j = tup
-    return [(i, j+x) for x in range(-8, 9) if x] + [(i+x, j) for x in range(-9, 10) if x]
+    return [(i, j_) for j_ in range(9) if j_ != j] + [(i_, j) for i_ in range(10) if i_ != i]
 
 
 def knight_targets(tup):
