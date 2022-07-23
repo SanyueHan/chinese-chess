@@ -11,7 +11,7 @@ class StateForMankind(StateBase):
         lines = ["一二三四五六七八九", *[''.join(DISPLAY[c] for c in row) for row in self._rows], "九八七六五四三二一"]
         return f'\n'.join(shift + line for line in lines)
 
-    def parse_command(self, command: str) -> tuple:
+    def parse_command(self, command: str) -> (int, int):
         """
         Input command, return start coordinate and final coordinate for the movement.
         Check whether the movement is allowed for that kind of piece only,
@@ -106,4 +106,4 @@ class StateForMankind(StateBase):
                     i += 1 if horizontal_displacement == 2 else 2
         final = (i, j)
 
-        return start, final
+        return start[0] * 9 + start[1], final[0] * 9 + final[1]
