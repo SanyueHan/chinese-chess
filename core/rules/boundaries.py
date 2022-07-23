@@ -1,11 +1,51 @@
 
 
+PALACE = (
+    0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 0, 0, 1, 1, 1, 0, 0, 0,
+    0, 0, 0, 1, 1, 1, 0, 0, 0,
+)
+
+
+EE = (
+    0, 0, 1, 0, 0, 0, 1, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 1, 0, 0, 0, 1, 0, 0,
+    0, 0, 1, 0, 0, 0, 1, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 1, 0, 0, 0, 1, 0, 0,
+)
+
+
+def in_palace(i):
+    return PALACE[i]
+
+
+def not_limited(i):
+    return True
+
+
+def at_elephant_eye(i):
+    return EE[i]
+
+
 BOUNDARY = {
-    'r': lambda i, j: True,
-    'k': lambda i, j: True,
-    'c': lambda i, j: True,
-    'm': lambda i, j: not (i in {3, 6} and j in {0, 2, 4, 6, 8}),
-    'a': lambda i, j: i in {0, 1, 2, 7, 8, 9} and j in {3, 4, 5},
-    'g': lambda i, j: i in {0, 1, 2, 7, 8, 9} and j in {3, 4, 5},
-    'p': lambda i, j: True
+    'r': not_limited,
+    'k': not_limited,
+    'c': not_limited,
+    'm': at_elephant_eye,
+    'a': in_palace,
+    'g': in_palace,
+    'p': not_limited
 }
