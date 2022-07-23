@@ -6,7 +6,6 @@ from core.errors import *
 from core.role import Role, get_role
 from core.rules.boundaries import BOUNDARY
 from core.rules.paths import PATH
-from core.rules.pieces import CANNON
 
 
 class StateBase(metaclass=TimeAnalyzer):
@@ -86,7 +85,7 @@ class StateBase(metaclass=TimeAnalyzer):
 
         path = ''.join(self._board[point] for point in PATH[piece_s.lower()](vector))
         num_of_obstacle = len(path) - path.count(' ')
-        if piece_s in CANNON and piece_f != ' ':
+        if piece_s.upper() == 'C' and piece_f != ' ':
             # cannon is attacking, one obstacle should on the path
             if num_of_obstacle != 1:
                 raise NotOneRackError

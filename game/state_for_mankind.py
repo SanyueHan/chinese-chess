@@ -1,7 +1,7 @@
 from core.consts.coding import DECODE, encode
-from core.rules.pieces import *
 from core import StateBase
 from game.display import DISPLAY
+from game.pieces import *
 
 
 class StateForMankind(StateBase):

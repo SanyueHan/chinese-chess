@@ -3,7 +3,6 @@ from typing import List, Union
 from TimeAnalyzer.metaclass import TimeAnalyzer
 from core import StateBase
 from core.role import Role, get_role
-from core.rules.pieces import *
 from core.rules.targets import TARGETS
 
 
@@ -58,7 +57,7 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
             for i in (0, 1, 2, 7, 8, 9):
                 for j in (3, 4, 5):
                     index = i * 9 + j
-                    if self._board[index] in GENERAL:
+                    if self._board[index].upper() == 'G':
                         if side.iff_func(self._board[index]):
                             self.__generals[side] = index
                             return index
@@ -82,7 +81,7 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
         if fun := TARGETS.get(piece.lower()):
             return fun(source)
         side = get_role(piece)
-        if piece in PAWN:
+        if piece.upper() == 'P':
             pawn_targets = []
             if self._get_general_position(side) // 9 in (0, 1, 2):
                 pawn_targets.append(source + 9)
@@ -93,7 +92,7 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
                 if source // 9 <= 4:
                     pawn_targets.extend([source + 1, source - 1])
             return pawn_targets
-        if piece in GENERAL:
+        if piece.upper() == 'G':
             general_targets = [source + 9, source - 9, source + 1, source - 1]
             opponent_general_index = self._get_general_position(side.opponent)
             if opponent_general_index % 9 == source % 9:
