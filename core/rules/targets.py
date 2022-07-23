@@ -48,15 +48,10 @@ def advisor_targets(source):
     return [source + 10, source + 8, source - 8, source - 10]
 
 
-def general_targets(source):
-    return [source + 9, source - 9, source + 1, source - 1]
-
-
 TARGETS = {
     'r': rook_cannon_targets,
     'k': knight_targets,
     'c': rook_cannon_targets,
     'm': minister_targets,
     'a': advisor_targets,
-    'g': general_targets,
 }
