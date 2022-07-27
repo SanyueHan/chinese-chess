@@ -1,18 +1,4 @@
 ENCODE = {
-    '进': '+',
-    '退': '-',
-    '平': '=',
-    '前': '^',  # front
-    '后': '$',  # back
-    '一': '1',
-    '二': '2',
-    '三': '3',
-    '四': '4',
-    '五': '5',
-    '六': '6',
-    '七': '7',
-    '八': '8',
-    '九': '9',
     '车': 'r',  # rook
     '马': 'k',  # knight
     '炮': 'c',  # cannon
@@ -27,7 +13,6 @@ ENCODE = {
     '仕': 'A',
     '将': 'G',
     '卒': 'P',
-    '\u3000': ' '
 }
 
 
@@ -35,8 +20,8 @@ DECODE = {e: c for c, e in ENCODE.items()}
 
 
 def encode(string: str) -> str:
-    return ''.join(ENCODE.get(c, c) for c in string)
+    return ''.join(ENCODE.get(c, ' ') for c in string)
 
 
 def decode(string: str) -> str:
-    return ''.join(DECODE.get(c, c) for c in string)
+    return ''.join(DECODE.get(c, '\u3000') for c in string)
