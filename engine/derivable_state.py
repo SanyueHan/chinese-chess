@@ -68,12 +68,15 @@ class DerivableState(StateBase, metaclass=TimeAnalyzer):
         return self.__generals[side]
 
     def _get_pieces(self, side: Role) -> dict:
-        if side not in self.__pieces:
-            new_dict = {}
-            self.__pieces[side] = new_dict
+        if len(self.__pieces) == 0:
+            self_d = self.__pieces[self._current_player] = {}
+            oppo_d = self.__pieces[self._current_player.opponent] = {}
             for i in range(90):
-                if side.iff_func(self._board[i]):
-                    new_dict[i] = self._board[i]
+                if self._board[i].isalpha():
+                    if self._current_player.iff_func(self._board[i]):
+                        self_d[i] = self._board[i]
+                    else:
+                        oppo_d[i] = self._board[i]
         return self.__pieces[side]
 
     def _get_targets(self, source: int) -> List[int]:
