@@ -1,6 +1,7 @@
 from typing import Tuple
 
 from TimeAnalyzer.metaclass import TimeAnalyzer
+from clibs.interface import is_valid
 from core.consts.coding import decode, encode
 from core.errors import *
 from core.role import Role, get_role
@@ -58,11 +59,7 @@ class StateBase(metaclass=TimeAnalyzer):
             return '\n'.join(self._rows) + '\n' + self._current_player.name
 
     def is_valid(self, vector: (int, int)) -> bool:
-        try:
-            self.check_validity(vector)
-            return True
-        except RuleViolatedError:
-            return False
+        return is_valid(bytes(self._board, encoding='ascii'), vector[0], vector[1])
 
     def check_validity(self, vector: (int, int)) -> (int, int):
         """
