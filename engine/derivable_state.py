@@ -1,6 +1,7 @@
 from typing import List, Union
 
-from TimeAnalyzer.metaclass import TimeAnalyzer
+from time_analyzer.metaclass import TimeAnalyzer
+
 from core import StateBase
 from core.role import Role, get_role
 from core.rules.targets import TARGETS

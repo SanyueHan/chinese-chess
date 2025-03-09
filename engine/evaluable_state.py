@@ -1,4 +1,5 @@
-from TimeAnalyzer.metaclass import TimeAnalyzer
+from time_analyzer.metaclass import TimeAnalyzer
+
 from engine.derivable_state import DerivableState
 
 

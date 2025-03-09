@@ -1,4 +1,5 @@
-from TimeAnalyzer.timer import Timer
+from time_analyzer.timer import Timer
+
 from config import AI_SEARCH_DEPTH
 from engine.tree_searcher import TreeSearcher
 

@@ -1,6 +1,7 @@
 from typing import Tuple
 
-from TimeAnalyzer.metaclass import TimeAnalyzer
+from time_analyzer.metaclass import TimeAnalyzer
+
 from core.consts.coding import decode, encode
 from core.errors import *
 from core.role import Role, get_role
