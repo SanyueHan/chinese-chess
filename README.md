@@ -1,13 +1,8 @@
 
 
-### Clone
-```shell
-git clone --recursive git@github.com:SanyueHan/Chinese_Chess.git
-```
-or
-```shell
-git clone git@github.com:SanyueHan/Chinese_Chess.git
-git submodule update --init --recursive
+### Prepare Dependencies
+```commandline
+pip install https://github.com/SanyueHan/time-analyzer/archive/master.zip
 ```
 
 
